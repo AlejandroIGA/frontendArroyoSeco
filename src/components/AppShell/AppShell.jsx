@@ -1,4 +1,4 @@
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRow } from "@ionic/react";
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRow, useIonViewWillLeave } from "@ionic/react";
 import { personOutline, logInOutline } from 'ionicons/icons';
 
 import SearchBar from "../SearchBar/SearchBar";
@@ -14,6 +14,10 @@ const AppShell = () => {
     });
 
     const [popoverState, setPopoverState] = useState({ showPopover: false, event: undefined });
+
+    useIonViewWillLeave(() => {
+        setPopoverState({ showPopover: false, event: undefined });
+    });
 
     return (
         <>
