@@ -1,5 +1,5 @@
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRow, useIonViewWillLeave } from "@ionic/react";
-import { personOutline, logInOutline } from 'ionicons/icons';
+import { personOutline, logInOutline, person } from 'ionicons/icons';
 
 import SearchBar from "../SearchBar/SearchBar";
 import { useState } from "react";
@@ -19,11 +19,16 @@ const AppShell = () => {
         setPopoverState({ showPopover: false, event: undefined });
     });
 
+    const handleLogOut = () => {
+        localStorage.removeItem("isSessionActive");
+        window.location.reload();
+    }
+
     return (
         <>
             <IonHeader>
-                <IonGrid>
-                    <IonRow>
+                <IonGrid >
+                    <IonRow className="ion-align-items-center">
                         <IonCol size="2">
                             <IonImg />
                         </IonCol>
@@ -42,7 +47,7 @@ const AppShell = () => {
                                 }
                             }
                             >
-                                <IonIcon slot="icon-only" icon={personOutline} color="primary" size="large" />
+                                <IonIcon slot="icon-only" icon={ localStorage.getItem("isSessionActive") ? person : personOutline} color="primary" size="large" />
                             </IonButton>
                         </IonCol>
                     </IonRow>
@@ -74,21 +79,9 @@ const AppShell = () => {
                                     </IonCol>
                                 </IonRow>
                                 <IonRow>
-                                    <IonCol size="4">
+                                    <IonCol>
                                         <IonCard className="cell">
                                             <IonCardHeader><IonCardTitle>Fila 2, Col 1</IonCardTitle></IonCardHeader>
-                                            <IonCardContent>Contenido...</IonCardContent>
-                                        </IonCard>
-                                    </IonCol>
-                                    <IonCol size="4">
-                                        <IonCard className="cell">
-                                            <IonCardHeader><IonCardTitle>Fila 2, Col 2</IonCardTitle></IonCardHeader>
-                                            <IonCardContent>Contenido...</IonCardContent>
-                                        </IonCard>
-                                    </IonCol>
-                                    <IonCol size="4">
-                                        <IonCard className="cell">
-                                            <IonCardHeader><IonCardTitle>Fila 2, Col 3</IonCardTitle></IonCardHeader>
                                             <IonCardContent>Contenido...</IonCardContent>
                                         </IonCard>
                                     </IonCol>
@@ -120,10 +113,19 @@ const AppShell = () => {
             >
                 <IonContent>
                     <IonList>
-                        <IonItem button={true} detail={false} routerLink="/login">
+                        {
+                            localStorage.getItem("isSessionActive") ? 
+                            <IonItem button={true} detail={false} onClick={handleLogOut}>
+                            <IonIcon slot="start" icon={logInOutline} />
+                            <IonLabel>Cerrar Sesión</IonLabel>
+                        </IonItem>
+                            :
+                            <IonItem button={true} detail={false} routerLink="/login">
                             <IonIcon slot="start" icon={logInOutline} />
                             <IonLabel>Iniciar Sesión</IonLabel>
                         </IonItem>
+                        }
+                        
                     </IonList>
                 </IonContent>
             </IonPopover>

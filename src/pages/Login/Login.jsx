@@ -21,17 +21,22 @@ import {
 
 import { mailOutline, lockClosedOutline } from 'ionicons/icons';
 import './Login.css';
+import authService from '../../services/authService.js';
+
+import { useHistory } from 'react-router-dom';
 
 const Login = () => {
 
+    const history = useHistory();
+
     const [formData, setFormData] = useState({
         email: '',
-        password: ''
+        psw: ''
     });
 
     const [errors, setErrors] = useState({
         email: '',
-        password: ''
+        psw: ''
     });
 
     const handleInputChange = (e) => {
@@ -43,7 +48,7 @@ const Login = () => {
     };
 
     const validateForm = () => {
-        const newErrors = { email: '', password: '' };
+        const newErrors = { email: '', psw: '' };
         let isValid = true;
 
         // Validación del correo
@@ -56,11 +61,11 @@ const Login = () => {
         }
 
         // Validación de la contraseña
-        if (!formData.password) {
-            newErrors.password = 'La contraseña es obligatoria.';
+        if (!formData.psw) {
+            newErrors.psw = 'La contraseña es obligatoria.';
             isValid = false;
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'La contraseña debe tener al menos 6 caracteres.';
+        } else if (formData.psw.length < 4) {
+            newErrors.psw = 'La contraseña debe tener al menos 4 caracteres.';
             isValid = false;
         }
 
@@ -68,11 +73,17 @@ const Login = () => {
         return isValid;
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
+        setErrors(prev => ({ ...prev, api: '' }));
         if (validateForm()) {
-            console.log('Formulario válido, iniciando sesión con:', formData);
-        } else {
-            console.log('Formulario inválido, revisa los errores.');
+            try {
+                await authService.login(formData)
+                setFormData({ email: '', psw: '' });
+                localStorage.setItem("isSessionActive", true);
+                history.push('/');
+            } catch (error) {
+                setErrors(prev => ({ ...prev, api: 'Correo o contraseña incorrectos.' }));
+            }
         }
     };
 
@@ -100,6 +111,7 @@ const Login = () => {
                                             labelPlacement="floating"
                                             name="email"
                                             type="email"
+                                            value={formData.email}
                                             onIonInput={handleInputChange}
                                         />
                                     </IonItem>
@@ -110,15 +122,19 @@ const Login = () => {
                                         <IonInput
                                             label="Contraseña"
                                             labelPlacement='floating'
-                                            name="password"
+                                            name="psw"
                                             type="password"
-                                            value={formData.password}
+                                            value={formData.psw}
                                             onIonInput={handleInputChange}
                                         />
                                     </IonItem>
-                                    {errors.password && <p className="error-message">{errors.password}</p>}
+                                    {errors.psw && <p className="error-message">{errors.psw}</p>}
                                 </IonList>
-
+                                {errors.api && (
+                                    <p className="error-message ion-text-center">
+                                        {errors.api}
+                                    </p>
+                                )}
                                 <IonButton
                                     expand="block"
                                     onClick={handleLogin}
