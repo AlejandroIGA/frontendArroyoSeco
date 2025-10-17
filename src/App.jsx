@@ -1,7 +1,12 @@
+import { Route } from 'react-router-dom';
+
 //Ionic Imports
-import '@ionic/react/css/core.css';
+import { IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp } from '@ionic/react';
+import { IonReactRouter } from '@ionic/react-router';
 
 /* Basic CSS for apps built with Ionic */
+import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
 import '@ionic/react/css/typography.css';
@@ -13,8 +18,8 @@ import '@ionic/react/css/text-alignment.css';
 import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
-import { IonApp } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
+
+import AppShell from './components/AppShell/AppShell';
 
 setupIonicReact();
 
@@ -25,7 +30,7 @@ function App() {
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet>
-
+          <Route path="/" exact component={AppShell}/>
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

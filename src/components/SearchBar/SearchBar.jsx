@@ -62,7 +62,7 @@ const SearchBar = ({
             </IonCol>
             <IonCol size="auto">
                 <IonButton onClick={handleSearch}>
-                    <IonIcon slot="icon-only" icon={searchOutline} />
+                    <IonIcon slot="icon-only" icon={searchOutline}/>
                 </IonButton>
             </IonCol>
         </IonRow>
