@@ -1,16 +1,19 @@
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonRow } from "@ionic/react";
-import { personOutline } from 'ionicons/icons';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRow } from "@ionic/react";
+import { personOutline, logInOutline } from 'ionicons/icons';
 
 import SearchBar from "../SearchBar/SearchBar";
 import { useState } from "react";
 
 const AppShell = () => {
+
     const [searchCriteria, setSearchCriteria] = useState({
         guests: '',
         price: '',
         startDate: '',
         endDate: ''
     });
+
+    const [popoverState, setPopoverState] = useState({ showPopover: false, event: undefined });
 
     return (
         <>
@@ -26,7 +29,15 @@ const AppShell = () => {
                             />
                         </IonCol>
                         <IonCol size="2">
-                            <IonButton fill="clear" arial_label="account">
+                            <IonButton 
+                                fill="clear" 
+                                arial_label="account"
+                                onClick={(e) => {
+                                    e.persist(); 
+                                    setPopoverState({showPopover: true, event: e});
+                                }
+                            }
+                            >
                                 <IonIcon slot="icon-only" icon={personOutline} color="primary" size="large" />
                             </IonButton>
                         </IonCol>
@@ -95,6 +106,23 @@ const AppShell = () => {
             <IonFooter>
                 <p style={{ textAlign: "center" }}>Todos los derechos reservados MPI 2025</p>
             </IonFooter>
+
+            <IonPopover
+                isOpen={popoverState.showPopover}
+                event={popoverState.event}
+                onDidDismiss={() => setPopoverState({ showPopover: false, event: undefined })}
+                side="bottom"
+                alignment="end"
+            >
+                <IonContent>
+                    <IonList>
+                        <IonItem button={true} detail={false} routerLink="/login">
+                            <IonIcon slot="start" icon={logInOutline} />
+                            <IonLabel>Iniciar Sesión</IonLabel>
+                        </IonItem>
+                    </IonList>
+                </IonContent>
+            </IonPopover>
         </>
     )
 }
