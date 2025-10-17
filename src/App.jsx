@@ -22,6 +22,7 @@ import '@ionic/react/css/display.css';
 import AppShell from './components/AppShell/AppShell';
 import Home from './pages/Home/Home';
 import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
 
 setupIonicReact();
 
@@ -34,6 +35,7 @@ function App() {
         <IonRouterOutlet>
           <Route path="/" exact component={Home}/>
           <Route path="/login" exact component={Login}/>
+          <Route path="/register" exact component={Register}/>
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
