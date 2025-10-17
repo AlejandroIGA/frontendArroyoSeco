@@ -20,6 +20,7 @@ import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
 import AppShell from './components/AppShell/AppShell';
+import Home from './pages/Home/Home';
 
 setupIonicReact();
 
@@ -30,7 +31,7 @@ function App() {
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet>
-          <Route path="/" exact component={AppShell}/>
+          <Route path="/" exact component={Home}/>
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
