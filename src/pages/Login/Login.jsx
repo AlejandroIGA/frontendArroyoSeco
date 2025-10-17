@@ -15,7 +15,8 @@ import {
     IonIcon,
     IonGrid,
     IonRow,
-    IonCol
+    IonCol,
+    IonRouterLink
 } from '@ionic/react';
 
 import { mailOutline, lockClosedOutline } from 'ionicons/icons';
@@ -80,7 +81,7 @@ const Login = () => {
             <IonHeader>
                 <IonToolbar>
                     <IonButtons slot="start">
-                        <IonBackButton defaultHref="/home" />
+                        <IonBackButton defaultHref="/" />
                     </IonButtons>
                     <IonTitle>Iniciar Sesión</IonTitle>
                 </IonToolbar>
@@ -125,6 +126,12 @@ const Login = () => {
                                 >
                                     Ingresar
                                 </IonButton>
+                                <div className="ion-text-center ion-margin-top register-link-container">
+                                    <span>¿No tienes una cuenta? </span>
+                                    <IonRouterLink routerLink="/register" className="register-link">
+                                        Regístrate aquí
+                                    </IonRouterLink>
+                                </div>
                             </div>
                         </IonCol>
                     </IonRow>
