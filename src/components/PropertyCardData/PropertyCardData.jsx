@@ -9,25 +9,30 @@ import {
     IonList,
     IonItem,
     IonLabel,
-    IonIcon
+    IonIcon,
+    IonButton,
+    IonRouterLink
 } from '@ionic/react';
 import { cashOutline, peopleOutline, homeOutline } from 'ionicons/icons';
 import './PropertyCardData.css';
 
 const PropertyCardData = ({ property }) => {
-    const { name, pricePerNight, numberOfGuests, imageUrl } = property;
+    const { id, name, pricePerNight, numberOfGuests, imageUrl } = property;
 
     return (
         <IonCard className="property-card-horizontal">
             <IonGrid>
                 <IonRow className="ion-align-items-center">
-                    {/* Columna de la Imagen (Izquierda) */}
-                    <IonCol size="4">
-                        <IonImg src={imageUrl} alt={name} className="property-image" />
+                    
+                    <IonCol size="12" size-md="4">
+                        <IonImg 
+                            src={imageUrl}
+                            alt={name} 
+                            className="property-image" 
+                        />
                     </IonCol>
 
-                    {/* Columna de la Información (Derecha) */}
-                    <IonCol size="8">
+                    <IonCol size="12" size-md="8">
                         <IonCardContent>
                             <IonList lines="none">
                                 <IonItem>
@@ -51,6 +56,15 @@ const PropertyCardData = ({ property }) => {
                                     </IonLabel>
                                 </IonItem>
                             </IonList>
+
+                            <div className="ion-text-end ion-padding-top">
+                                <IonRouterLink routerLink={`/propiedad/${id}`}>
+                                    <IonButton fill="outline" size="small">
+                                        Más detalles
+                                    </IonButton>
+                                </IonRouterLink>
+                            </div>
+                            
                         </IonCardContent>
                     </IonCol>
                 </IonRow>

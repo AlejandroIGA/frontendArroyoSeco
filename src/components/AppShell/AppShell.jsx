@@ -1,9 +1,12 @@
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRouterLink, IonRow, useIonViewWillLeave } from "@ionic/react";
-import { personOutline, logInOutline, person } from 'ionicons/icons';
+import { IonButton, IonCol, IonContent, IonFooter, IonGrid, IonHeader, 
+    IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRouterLink, 
+    IonRow, useIonViewWillLeave, IonModal, IonDatetime } from "@ionic/react";
+import { personOutline, logInOutline, person, searchOutline } from 'ionicons/icons';
 
 import './AppShell.css'
 import SearchBar from "../SearchBar/SearchBar";
 import { useState } from "react";
+import MobileSearchModal from "../MobileSearchModal/MobileSearchModal";
 
 const AppShell = ({ children }) => {
 
@@ -13,6 +16,27 @@ const AppShell = ({ children }) => {
         startDate: '',
         endDate: ''
     });
+    const [showStartDateModal, setShowStartDateModal] = useState(false);
+    const [showEndDateModal, setShowEndDateModal] = useState(false);
+    const [showSearchModal, setShowSearchModal] = useState(false);
+
+    const handleDateChange = (e, field) => {
+        const value = e.detail.value.split('T')[0]; // Formato YYYY-MM-DD
+        setSearchCriteria(prev => ({ ...prev, [field]: value }));
+        
+        if (field === 'startDate') setShowStartDateModal(false);
+        if (field === 'endDate') setShowEndDateModal(false);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSearchCriteria(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSearch = () => {
+        console.log("Buscando con:", searchCriteria);
+        setShowSearchModal(false); // Cierra el modal si estaba abierto
+    };
 
     const [popoverState, setPopoverState] = useState({ showPopover: false, event: undefined });
 
@@ -39,10 +63,16 @@ const AppShell = ({ children }) => {
                                 />
                             </IonRouterLink>
                         </IonCol>
-                        <IonCol>
+                        <IonCol className="ion-hide-lg-down">
                             <SearchBar
                                 searchCriteria={searchCriteria}
                             />
+                        </IonCol>
+                        <IonCol className="ion-hide-lg-up ion-text-center">
+                            <IonButton fill="outline" shape="round" onClick={() => setShowSearchModal(true)}>
+                                Buscar estancias
+                                <IonIcon slot="end" icon={searchOutline} />
+                            </IonButton>
                         </IonCol>
                         <IonCol size="2" className="ion-text-center">
                             <IonButton
@@ -66,6 +96,44 @@ const AppShell = ({ children }) => {
             <IonFooter>
                 <p style={{ textAlign: "center" }}>Todos los derechos reservados 2025</p>
             </IonFooter>
+
+            <MobileSearchModal
+                isOpen={showSearchModal}
+                onClose={() => setShowSearchModal(false)}
+                searchCriteria={searchCriteria}
+                handleInputChange={handleInputChange}
+                handleSearch={handleSearch}
+                setShowStartDateModal={setShowStartDateModal}
+                setShowEndDateModal={setShowEndDateModal}
+            />
+
+            <IonModal 
+                isOpen={showStartDateModal} 
+                onDidDismiss={() => setShowStartDateModal(false)}
+                className="date-modal"
+            >
+                <IonDatetime 
+                    onIonChange={(e) => handleDateChange(e, 'startDate')}
+                    presentation="date"
+                    showDefaultButtons={true}
+                    doneText="Aceptar"
+                    cancelText="Cancelar"
+                />
+            </IonModal>
+
+            <IonModal 
+                isOpen={showEndDateModal} 
+                onDidDismiss={() => setShowEndDateModal(false)}
+                className="date-modal"
+            >
+                <IonDatetime 
+                    onIonChange={(e) => handleDateChange(e, 'endDate')}
+                    presentation="date"
+                    showDefaultButtons={true}
+                    doneText="Aceptar"
+                    cancelText="Cancelar"
+                />
+            </IonModal>
 
             <IonPopover
                 isOpen={popoverState.showPopover}

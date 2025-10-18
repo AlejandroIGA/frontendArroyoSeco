@@ -1,5 +1,3 @@
-// src/components/SearchBar.jsx
-import React from 'react';
 import { IonRow, IonCol, IonItem, IonIcon, IonInput, IonButton } from "@ionic/react";
 import { peopleOutline, cashOutline, calendarOutline, searchOutline } from 'ionicons/icons';
 
