@@ -1,10 +1,11 @@
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRow, useIonViewWillLeave } from "@ionic/react";
-import { personOutline, logInOutline } from 'ionicons/icons';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRouterLink, IonRow, useIonViewWillLeave } from "@ionic/react";
+import { personOutline, logInOutline, person } from 'ionicons/icons';
 
+import './AppShell.css'
 import SearchBar from "../SearchBar/SearchBar";
 import { useState } from "react";
 
-const AppShell = () => {
+const AppShell = ({ children }) => {
 
     const [searchCriteria, setSearchCriteria] = useState({
         guests: '',
@@ -19,96 +20,51 @@ const AppShell = () => {
         setPopoverState({ showPopover: false, event: undefined });
     });
 
+    const handleLogOut = () => {
+        localStorage.removeItem("isSessionActive");
+        window.location.reload();
+    }
+
     return (
         <>
             <IonHeader>
-                <IonGrid>
-                    <IonRow>
-                        <IonCol size="2">
-                            <IonImg />
+                <IonGrid >
+                    <IonRow className="ion-align-items-center">
+                        <IonCol size="2" class="ion-justify-content-end">
+                            <IonRouterLink routerLink="/">
+                                <IonImg
+                                    src="/logo.png"
+                                    alt="Arroyo Seco"
+                                    className="header-logo"
+                                />
+                            </IonRouterLink>
                         </IonCol>
                         <IonCol>
                             <SearchBar
                                 searchCriteria={searchCriteria}
                             />
                         </IonCol>
-                        <IonCol size="2">
-                            <IonButton 
-                                fill="clear" 
+                        <IonCol size="2" className="ion-text-center">
+                            <IonButton
+                                fill="clear"
                                 arial_label="account"
                                 onClick={(e) => {
-                                    e.persist(); 
-                                    setPopoverState({showPopover: true, event: e});
+                                    e.persist();
+                                    setPopoverState({ showPopover: true, event: e });
                                 }
-                            }
+                                }
                             >
-                                <IonIcon slot="icon-only" icon={personOutline} color="primary" size="large" />
+                                <IonIcon slot="icon-only" icon={localStorage.getItem("isSessionActive") ? person : personOutline} color="primary" size="large" />
                             </IonButton>
                         </IonCol>
                     </IonRow>
                 </IonGrid>
             </IonHeader>
             <IonContent>
-                <IonGrid fixed={true}>
-                    <IonRow className="ion-align-items-stretch">
-                        <IonCol size="9">
-                            <IonGrid>
-                                <IonRow>
-                                    <IonCol size="4">
-                                        <IonCard className="cell">
-                                            <IonCardHeader><IonCardTitle>Fila 1, Col 1</IonCardTitle></IonCardHeader>
-                                            <IonCardContent>Contenido...</IonCardContent>
-                                        </IonCard>
-                                    </IonCol>
-                                    <IonCol size="4">
-                                        <IonCard className="cell">
-                                            <IonCardHeader><IonCardTitle>Fila 1, Col 2</IonCardTitle></IonCardHeader>
-                                            <IonCardContent>Contenido...</IonCardContent>
-                                        </IonCard>
-                                    </IonCol>
-                                    <IonCol size="4">
-                                        <IonCard className="cell">
-                                            <IonCardHeader><IonCardTitle>Fila 1, Col 3</IonCardTitle></IonCardHeader>
-                                            <IonCardContent>Contenido...</IonCardContent>
-                                        </IonCard>
-                                    </IonCol>
-                                </IonRow>
-                                <IonRow>
-                                    <IonCol size="4">
-                                        <IonCard className="cell">
-                                            <IonCardHeader><IonCardTitle>Fila 2, Col 1</IonCardTitle></IonCardHeader>
-                                            <IonCardContent>Contenido...</IonCardContent>
-                                        </IonCard>
-                                    </IonCol>
-                                    <IonCol size="4">
-                                        <IonCard className="cell">
-                                            <IonCardHeader><IonCardTitle>Fila 2, Col 2</IonCardTitle></IonCardHeader>
-                                            <IonCardContent>Contenido...</IonCardContent>
-                                        </IonCard>
-                                    </IonCol>
-                                    <IonCol size="4">
-                                        <IonCard className="cell">
-                                            <IonCardHeader><IonCardTitle>Fila 2, Col 3</IonCardTitle></IonCardHeader>
-                                            <IonCardContent>Contenido...</IonCardContent>
-                                        </IonCard>
-                                    </IonCol>
-                                </IonRow>
-                            </IonGrid>
-                        </IonCol>
-                        <IonCol size="3">
-                            <IonCard className="cell" style={{ height: '100%' }}>
-                                <IonCardHeader><IonCardTitle>Columna Compartida</IonCardTitle></IonCardHeader>
-                                <IonCardContent>
-                                    Esta columna abarca la altura de las dos filas de la izquierda.
-                                </IonCardContent>
-                            </IonCard>
-                        </IonCol>
-
-                    </IonRow>
-                </IonGrid>
+                {children}
             </IonContent>
             <IonFooter>
-                <p style={{ textAlign: "center" }}>Todos los derechos reservados MPI 2025</p>
+                <p style={{ textAlign: "center" }}>Todos los derechos reservados 2025</p>
             </IonFooter>
 
             <IonPopover
@@ -120,10 +76,19 @@ const AppShell = () => {
             >
                 <IonContent>
                     <IonList>
-                        <IonItem button={true} detail={false} routerLink="/login">
-                            <IonIcon slot="start" icon={logInOutline} />
-                            <IonLabel>Iniciar Sesión</IonLabel>
-                        </IonItem>
+                        {
+                            localStorage.getItem("isSessionActive") ?
+                                <IonItem button={true} detail={false} onClick={handleLogOut}>
+                                    <IonIcon slot="start" icon={logInOutline} />
+                                    <IonLabel>Cerrar Sesión</IonLabel>
+                                </IonItem>
+                                :
+                                <IonItem button={true} detail={false} routerLink="/login">
+                                    <IonIcon slot="start" icon={logInOutline} />
+                                    <IonLabel>Iniciar Sesión</IonLabel>
+                                </IonItem>
+                        }
+
                     </IonList>
                 </IonContent>
             </IonPopover>

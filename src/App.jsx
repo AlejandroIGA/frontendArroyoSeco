@@ -1,7 +1,8 @@
 import { Route } from 'react-router-dom';
+import React, {Suspense} from 'react';
 
 //Ionic Imports
-import { IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonRouterOutlet, IonSpinner, setupIonicReact } from '@ionic/react';
 import { IonApp } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 
@@ -19,10 +20,12 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
-import AppShell from './components/AppShell/AppShell';
-import Home from './pages/Home/Home';
-import Login from './pages/Login/Login';
-import Register from './pages/Register/Register';
+import './theme/variables.css';
+
+// Carga lenta de componentes (se carga cuando se utilicen lo que mejora rendimiento)
+const Home = React.lazy(() => import('./pages/Home/Home'));
+const Login = React.lazy(() => import('./pages/Login/Login'));
+const Register = React.lazy(() => import('./pages/Register/Register'));
 
 setupIonicReact();
 
@@ -32,11 +35,13 @@ function App() {
   return (
     <IonApp>
       <IonReactRouter>
-        <IonRouterOutlet>
+        <Suspense fallback={<IonSpinner name="crescent"/> }>
+          <IonRouterOutlet>
           <Route path="/" exact component={Home}/>
           <Route path="/login" exact component={Login}/>
           <Route path="/register" exact component={Register}/>
         </IonRouterOutlet>
+        </Suspense>
       </IonReactRouter>
     </IonApp>
   )
