@@ -16,7 +16,8 @@ import {
     IonGrid,
     IonRow,
     IonCol,
-    IonRouterLink
+    IonRouterLink,
+    IonLoading
 } from '@ionic/react';
 
 import { mailOutline, lockClosedOutline } from 'ionicons/icons';
@@ -28,6 +29,7 @@ import { useHistory } from 'react-router-dom';
 const Login = () => {
 
     const history = useHistory();
+    const [isLoading, setIsLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -76,13 +78,22 @@ const Login = () => {
     const handleLogin = async () => {
         setErrors(prev => ({ ...prev, api: '' }));
         if (validateForm()) {
+            setIsLoading(true);
             try {
                 await authService.login(formData)
+                setIsLoading(false);
                 setFormData({ email: '', psw: '' });
                 localStorage.setItem("isSessionActive", true);
                 history.push('/');
             } catch (error) {
+                setIsLoading(false);
+                if (error.code === "ERR_NETWORK") {
+                setErrors(prev => ({ ...prev, api: 'Error de conexión.' }));
+            } else if (error.response?.status === 401) {
                 setErrors(prev => ({ ...prev, api: 'Correo o contraseña incorrectos.' }));
+            } else {
+                setErrors(prev => ({ ...prev, api: 'Ocurrió un error inesperado.' }));
+            }
             }
         }
     };
@@ -153,6 +164,12 @@ const Login = () => {
                     </IonRow>
                 </IonGrid>
             </IonContent>
+            <IonLoading
+                isOpen={isLoading}
+                onDidDismiss={() => setIsLoading(false)}
+                message={'Ingresando...'}
+                duration={0}
+            />
         </IonPage>
     );
 };
