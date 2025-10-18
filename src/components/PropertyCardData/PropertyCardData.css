@@ -1,0 +1,16 @@
+.property-card-horizontal {
+    margin: 16px;
+}
+
+/* Asegura que la imagen cubra el espacio sin distorsionarse */
+.property-image {
+    width: 100%;
+    height: 150px; /* Ajusta la altura según necesites */
+    object-fit: cover;
+    border-radius: 8px; /* Opcional: para redondear las esquinas */
+}
+
+/* Quita el padding por defecto de la lista para un look más limpio */
+.property-card-horizontal ion-list {
+    padding: 0;
+}

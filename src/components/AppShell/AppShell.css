@@ -1,0 +1,29 @@
+/* Asegura que el grid principal ocupe toda la altura del contenido */
+.content-grid {
+    height: 100%;
+}
+
+/* Contenedor de la columna del aside */
+.aside-container {
+    /* Permite que el aside hijo se estire */
+    display: flex;
+    flex-direction: column;
+}
+
+/* El aside debe ocupar toda la altura de su contenedor */
+.full-height-aside {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* La tarjeta dentro del aside debe crecer para llenar el espacio */
+.full-height-aside .cell {
+    flex-grow: 1;
+}
+
+.header-logo {
+    max-height: 60px; /* Ajusta el tamaño según necesites */
+    max-width: 60px;
+    cursor: pointer;
+}

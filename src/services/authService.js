@@ -8,7 +8,15 @@ const authService = {
     } catch (error) {
         throw error;
     }
-}
+},
+    "register" : async (data) => {
+        try{
+            const response = await apiClient.post('/user/register', data);
+            return response;
+        }catch(error){
+            throw error;
+        }
+    } 
 }
 
 export default authService;

@@ -7,8 +7,13 @@ import {
 } from '@ionic/react';
 import { personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
 import './Register.css'; // Usaremos un CSS idéntico al del login
+import authService from '../../services/authService';
+
+import { useHistory } from 'react-router-dom';
 
 const RegisterPage = () => {
+    const history = useHistory();
+
     // 1. Expandimos el estado para los nuevos campos
     const [formData, setFormData] = useState({
         name: '',
@@ -16,7 +21,7 @@ const RegisterPage = () => {
         phone: '',
         country: '',
         email: '',
-        password: ''
+        psw: ''
     });
 
     // 2. Expandimos el estado de errores
@@ -26,7 +31,7 @@ const RegisterPage = () => {
         phone: '',
         country: '',
         email: '',
-        password: ''
+        psw: ''
     });
 
     const handleInputChange = (e) => {
@@ -39,7 +44,7 @@ const RegisterPage = () => {
 
     // 3. Actualizamos la función de validación
     const validateForm = () => {
-        const newErrors = { name: '', lastName: '', phone: '', country: '', email: '', password: '' };
+        const newErrors = { name: '', lastName: '', phone: '', country: '', email: '', psw: '' };
         let isValid = true;
 
         if (!formData.name) {
@@ -65,11 +70,11 @@ const RegisterPage = () => {
             newErrors.email = 'El formato del correo no es válido.';
             isValid = false;
         }
-        if (!formData.password) {
-            newErrors.password = 'La contraseña es obligatoria.';
+        if (!formData.psw) {
+            newErrors.psw = 'La contraseña es obligatoria.';
             isValid = false;
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'La contraseña debe tener al menos 6 caracteres.';
+        } else if (formData.psw.length < 4) {
+            newErrors.psw = 'La contraseña debe tener al menos 6 caracteres.';
             isValid = false;
         }
 
@@ -77,12 +82,21 @@ const RegisterPage = () => {
         return isValid;
     };
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
+        setErrors(prev => ({ ...prev, api: '' }));
         if (validateForm()) {
-            console.log('Formulario válido, registrando usuario:', formData);
-            // Aquí iría tu lógica para llamar a la API de registro
+            await authService.register(formData)
+            setFormData({
+        name: '',
+        lastName: '',
+        phone: '',
+        country: '',
+        email: '',
+        psw: ''
+    });
+            history.push('/login')
         } else {
-            console.log('Formulario inválido.');
+            setErrors(prev => ({ ...prev, api: 'Ocurrio un error al registrar los datos' }));
         }
     };
 
@@ -137,9 +151,9 @@ const RegisterPage = () => {
 
                                     <IonItem>
                                         <IonIcon icon={lockClosedOutline} slot="start" />
-                                        <IonInput label="Contraseña" labelPlacement="floating" name="password" type="password" value={formData.password} onIonInput={handleInputChange} />
+                                        <IonInput label="Contraseña" labelPlacement="floating" name="psw" type="password" value={formData.psw} onIonInput={handleInputChange} />
                                     </IonItem>
-                                    {errors.password && <p className="error-message">{errors.password}</p>}
+                                    {errors.psw && <p className="error-message">{errors.psw}</p>}
                                 </IonList>
 
                                 <IonButton expand="block" onClick={handleRegister} className="ion-margin-top">

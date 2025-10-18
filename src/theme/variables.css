@@ -1,0 +1,11 @@
+/* src/theme/variables.css */
+
+:root {
+  /** primary **/
+  --ion-color-primary: #c6402e;
+  --ion-color-primary-rgb: 198, 64, 46;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #ad3828;
+  --ion-color-primary-tint: #cb5342;
+}
