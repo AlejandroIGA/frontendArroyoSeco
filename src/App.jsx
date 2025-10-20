@@ -26,6 +26,7 @@ import './theme/variables.css';
 const Home = React.lazy(() => import('./pages/Home/Home'));
 const Login = React.lazy(() => import('./pages/Login/Login'));
 const Register = React.lazy(() => import('./pages/Register/Register'));
+const Reservation = React.lazy(() => import('./pages/Reservation/Reservation'));
 
 setupIonicReact();
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="/" exact component={Home}/>
           <Route path="/login" exact component={Login}/>
           <Route path="/register" exact component={Register}/>
+          <Route path="/reservation" exact component={Reservation}/>
         </IonRouterOutlet>
         </Suspense>
       </IonReactRouter>
