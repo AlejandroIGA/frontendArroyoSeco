@@ -1,0 +1,26 @@
+.reservation-form-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.reservation-summary {
+    border-top: 1px solid var(--ion-color-step-150, #d7d8da);
+    margin-top: 16px;
+}
+
+.reservation-summary p {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--ion-color-medium-shade);
+}
+
+.reservation-summary .total-price {
+    font-weight: 700;
+    color: var(--ion-color-primary);
+    margin-top: 8px;
+}
+
+/* Mejora la apariencia del botón que abre el calendario */
+ion-datetime-button::part(native) {
+    justify-content: flex-end;
+}

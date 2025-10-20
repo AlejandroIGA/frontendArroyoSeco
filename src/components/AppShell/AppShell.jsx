@@ -1,7 +1,7 @@
 import { IonButton, IonCol, IonContent, IonFooter, IonGrid, IonHeader, 
     IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRouterLink, 
     IonRow, useIonViewWillLeave, IonModal, IonDatetime } from "@ionic/react";
-import { personOutline, logInOutline, person, searchOutline } from 'ionicons/icons';
+import { personOutline, logInOutline, person, searchOutline, personCircleOutline } from 'ionicons/icons';
 
 import './AppShell.css'
 import SearchBar from "../SearchBar/SearchBar";
@@ -146,17 +146,22 @@ const AppShell = ({ children }) => {
                     <IonList>
                         {
                             localStorage.getItem("isSessionActive") ?
+                            <>
+                                <IonItem button={true} detail={false} routerLink="/reservation">
+                                    <IonIcon slot="start" icon={personCircleOutline} />
+                                    <IonLabel>Panel de usuario</IonLabel>
+                                </IonItem>
                                 <IonItem button={true} detail={false} onClick={handleLogOut}>
                                     <IonIcon slot="start" icon={logInOutline} />
                                     <IonLabel>Cerrar Sesión</IonLabel>
                                 </IonItem>
+                                </>
                                 :
                                 <IonItem button={true} detail={false} routerLink="/login">
                                     <IonIcon slot="start" icon={logInOutline} />
                                     <IonLabel>Iniciar Sesión</IonLabel>
                                 </IonItem>
                         }
-
                     </IonList>
                 </IonContent>
             </IonPopover>

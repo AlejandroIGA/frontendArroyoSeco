@@ -1,0 +1,82 @@
+/* Estructura principal con Flexbox para alinear las columnas */
+.reservations-grid {
+    height: 100%;
+}
+.reservations-grid > .ion-row {
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Columna de contenido */
+.content-col {
+    padding: 16px;
+    background: #ffffff;
+}
+
+.content-container h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--ion-color-dark, #222428);
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--ion-color-step-150, #d7d8da);
+    padding-bottom: 10px;
+}
+
+/* Estilo para las tarjetas de reservación */
+.reservation-card {
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.reservation-card ion-card-header {
+    background: var(--ion-color-light, #f4f5f8);
+    border-bottom: 1px solid var(--ion-color-step-150, #d7d8da);
+}
+
+.reservation-card ion-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.reservation-card ion-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.details-button {
+    margin: 0;
+}
+
+/* Estilos para el estado de la reservación */
+.status-confirmada {
+    color: var(--ion-color-success, #2dd36f);
+    font-weight: bold;
+}
+
+.status-pendiente {
+    color: var(--ion-color-warning, #ffc409);
+    font-weight: bold;
+}
+
+.status-rechazada {
+    color: var(--ion-color-danger, #e60606);
+    font-weight: bold;
+}
+
+/* Ajuste de padding en móvil para el contenido principal */
+@media (max-width: 767px) {
+    .content-col {
+       padding: 8px;
+    }
+}
+
+ion-split-pane {
+    height: 100%;
+}
