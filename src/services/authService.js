@@ -18,7 +18,12 @@ const authService = {
         }
     },
     "getProfile": async () => {
-        console.log("To do...")
+        try {
+            const response = await apiClient.get('/user/profile'); 
+            return response;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 
