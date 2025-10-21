@@ -16,20 +16,19 @@ const MainLayout = ({ children, activePage }) => {
             <IonButtons slot="start">
               <IonBackButton defaultHref="/" text="Regresar" />
             </IonButtons>
-            
+
             <IonButtons slot="end" className="ion-hide-md-up">
               <IonMenuButton />
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-
-        <IonContent fullscreen={true}>
-          <IonGrid>
-            <IonRow>
-              <IonCol size="4" size-md="3" className="ion-hide-md-down">
+        <IonContent fullscreen={true} scrollY={false}>
+          <IonGrid className="ion-h-100">
+            <IonRow className="ion-h-100">
+              <IonCol size="4" size-md="3" className="ion-hide-md-down sidebar-col">
                 <Sidebar activePage={activePage} />
               </IonCol>
-              <IonCol size="12" size-md="9">
+              <IonCol size="12" size-md="9" className="main-content-col">
                 {children}
               </IonCol>
             </IonRow>

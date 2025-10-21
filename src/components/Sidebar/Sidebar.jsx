@@ -10,7 +10,7 @@ import './Sidebar.css';
 
 const Sidebar = ({ activePage }) => {
     const menuItems = [
-        { title: 'Perfil', path: '/profile', icon: personCircleOutline, id: 'perfil' },
+        { title: 'Perfil', path: '/user-dashboard/profile', icon: personCircleOutline, id: 'perfil' },
         { title: 'Propiedades', path: '/property', icon: homeOutline, id: 'propiedades' },
         { title: 'Reservaciones', path: '/reservation', icon: calendarOutline, id: 'reservaciones' },
         { title: 'Pagos', path: '/payment', icon: cardOutline, id: 'pagos' }
