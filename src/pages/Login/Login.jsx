@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     IonPage,
     IonHeader,
@@ -33,12 +33,12 @@ const Login = () => {
 
     const [formData, setFormData] = useState({
         email: '',
-        psw: ''
+        password: ''
     });
 
     const [errors, setErrors] = useState({
         email: '',
-        psw: ''
+        password: ''
     });
 
     const handleInputChange = (e) => {
@@ -50,7 +50,7 @@ const Login = () => {
     };
 
     const validateForm = () => {
-        const newErrors = { email: '', psw: '' };
+        const newErrors = { email: '', password: '' };
         let isValid = true;
 
         // Validación del correo
@@ -63,11 +63,11 @@ const Login = () => {
         }
 
         // Validación de la contraseña
-        if (!formData.psw) {
-            newErrors.psw = 'La contraseña es obligatoria.';
+        if (!formData.password) {
+            newErrors.password = 'La contraseña es obligatoria.';
             isValid = false;
-        } else if (formData.psw.length < 4) {
-            newErrors.psw = 'La contraseña debe tener al menos 4 caracteres.';
+        } else if (formData.password.length < 4) {
+            newErrors.password = 'La contraseña debe tener al menos 4 caracteres.';
             isValid = false;
         }
 
@@ -82,7 +82,7 @@ const Login = () => {
             try {
                 await authService.login(formData)
                 setIsLoading(false);
-                setFormData({ email: '', psw: '' });
+                setFormData({ email: '', password: '' });
                 localStorage.setItem("isSessionActive", true);
                 history.push('/');
             } catch (error) {
@@ -90,13 +90,19 @@ const Login = () => {
                 if (error.code === "ERR_NETWORK") {
                 setErrors(prev => ({ ...prev, api: 'Error de conexión.' }));
             } else if (error.response?.status === 401) {
-                setErrors(prev => ({ ...prev, api: 'Correo o contraseña incorrectos.' }));
+                console.log(error);
+                setErrors(prev => ({ ...prev, api: error.response.data }));
             } else {
-                setErrors(prev => ({ ...prev, api: 'Ocurrió un error inesperado.' }));
+                setErrors(prev => ({ ...prev, api: error.response.data }));
             }
             }
         }
     };
+
+    useEffect(() => {
+        setFormData({ email: '', password: '' });
+        setErrors({ email: '', password: '' });
+    }, []);
 
     return (
         <IonPage>
@@ -133,13 +139,13 @@ const Login = () => {
                                         <IonInput
                                             label="Contraseña"
                                             labelPlacement='floating'
-                                            name="psw"
+                                            name="password"
                                             type="password"
-                                            value={formData.psw}
+                                            value={formData.password}
                                             onIonInput={handleInputChange}
                                         />
                                     </IonItem>
-                                    {errors.psw && <p className="error-message">{errors.psw}</p>}
+                                    {errors.password && <p className="error-message">{errors.password}</p>}
                                 </IonList>
                                 {errors.api && (
                                     <p className="error-message ion-text-center">
