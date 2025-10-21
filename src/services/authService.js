@@ -19,7 +19,7 @@ const authService = {
     },
     "reset" : async (email) => {
         try {
-        const response = await api.post("/auth/reset", { email });
+        const response = await apiClient.post("/user/reset", { email });
         console.log(response.data);
         return response.data;
         } catch (error) {
@@ -28,7 +28,7 @@ const authService = {
     },
     "verifyResetCode" : async (email, code) => {
         try {
-          const response = await api.post("/auth/verify-code", { email, code });
+          const response = await apiClient.post("/user/verify-code", { email, code });
           console.log(response.data);
           return response.data;
         } catch (error) {
@@ -37,7 +37,7 @@ const authService = {
     },
     "resetPassword" : async (email, code, newPassword) => {
         try {
-          const response = await api.post("/auth/reset-password", { 
+          const response = await apiClient.post("/user/reset-password", { 
             email, 
             code, 
             newPassword 
