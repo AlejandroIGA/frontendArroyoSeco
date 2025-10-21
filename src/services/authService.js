@@ -17,14 +17,37 @@ const authService = {
             throw error;
         }
     },
-    "getProfile": async () => {
+    "reset" : async (email) => {
         try {
-            const response = await apiClient.get('/user/profile'); 
-            return response;
+        const response = await apiClient.post("/user/reset", { email });
+        console.log(response.data);
+        return response.data;
         } catch (error) {
             throw error;
         }
-    }
+    },
+    "verifyResetCode" : async (email, code) => {
+        try {
+          const response = await apiClient.post("/user/verify-code", { email, code });
+          console.log(response.data);
+          return response.data;
+        } catch (error) {
+          throw error;
+        }
+    },
+    "resetPassword" : async (email, code, newPassword) => {
+        try {
+          const response = await apiClient.post("/user/reset-password", { 
+            email, 
+            code, 
+            newPassword 
+          });
+          console.log(response.data);
+          return response.data;
+        } catch (error) {
+          throw error.response.data.message;
+        }
+      }
 }
 
 export default authService;

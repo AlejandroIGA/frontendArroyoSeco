@@ -32,7 +32,7 @@ const UserProfile = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const userData = await authService.getProfile();
+                const userData = await userService.getProfile();
                 //setFormData(userData);
                 setIsLoading(false);
             } catch (error) {
