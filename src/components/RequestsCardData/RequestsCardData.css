@@ -1,0 +1,48 @@
+.request-card {
+  margin-bottom: 20px;
+}
+
+.guest-item {
+  --background: transparent;
+  --padding-start: 0;
+  padding-left: 0;
+}
+
+.guest-item h2 {
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.guest-item p {
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+}
+
+.actions-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 0;
+}
+
+.no-requests-message {
+  text-align: center;
+  margin-top: 40px;
+  color: var(--ion-color-medium);
+}
+
+.placeholder-message {
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+  background: var(--ion-color-light, #f4f5f8);
+  border-radius: 8px;
+}
+
+.placeholder-message h2 {
+    color: var(--ion-color-dark);
+}
+
+.placeholder-message p {
+  color: var(--ion-color-medium);
+}
