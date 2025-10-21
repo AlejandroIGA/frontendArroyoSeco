@@ -4,7 +4,7 @@ import {
     IonBackButton, IonList, IonItem, IonInput, IonButton,
     IonIcon, IonGrid, IonRow, IonCol,
     IonRouterLink,
-    IonLoading, useIonToast
+    IonLoading, useIonToast, IonSelect, IonSelectOption
 } from '@ionic/react';
 import { personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
 import './Register.css'; // Usaremos un CSS idéntico al del login
@@ -22,7 +22,7 @@ const RegisterPage = () => {
         name: '',
         lastName: '',
         phone: '',
-        country: '',
+        country: 'Mexico',
         email: '',
         password: ''
     });
@@ -38,17 +38,22 @@ const RegisterPage = () => {
     });
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+    const name = e.target.name || e.detail.name;
+    const value = e.detail.value !== undefined ? e.detail.value : e.target.value;
+
+    if (name) {
         setFormData(prev => ({ ...prev, [name]: value }));
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
-    };
+    }
+};
 
     // 3. Actualizamos la función de validación
     const validateForm = () => {
         const newErrors = { name: '', lastName: '', phone: '', country: '', email: '', password: '' };
         let isValid = true;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
 
         if (!formData.name) {
             newErrors.name = 'El nombre es obligatorio.';
@@ -60,6 +65,9 @@ const RegisterPage = () => {
         }
         if (!formData.phone) {
             newErrors.phone = 'El número de teléfono es obligatorio.';
+            isValid = false;
+        } else if (formData.phone.length > 14) {
+            newErrors.phone = 'El teléfono no debe exceder los 14 caracteres.';
             isValid = false;
         }
         if (!formData.country) {
@@ -76,8 +84,8 @@ const RegisterPage = () => {
         if (!formData.password) {
             newErrors.password = 'La contraseña es obligatoria.';
             isValid = false;
-        } else if (formData.password.length < 4) {
-            newErrors.password = 'La contraseña debe tener al menos 6 caracteres.';
+        } else if (!passwordRegex.test(formData.password)) {
+            newErrors.password = 'Debe tener min. 12 caracteres, incluir mayúscula, minúscula, número y caracter especial (@$!%*?&).';
             isValid = false;
         }
 
@@ -167,13 +175,21 @@ const RegisterPage = () => {
 
                                     <IonItem>
                                         <IonIcon icon={callOutline} slot="start" />
-                                        <IonInput label="Número de teléfono" labelPlacement="floating" name="phone" type="tel" value={formData.phone} onIonInput={handleInputChange} />
+                                        <IonInput label="Número de teléfono" labelPlacement="floating" name="phone" type="tel" value={formData.phone} onIonInput={handleInputChange} maxlength={14} />
                                     </IonItem>
                                     {errors.phone && <p className="error-message">{errors.phone}</p>}
 
                                     <IonItem>
                                         <IonIcon icon={earthOutline} slot="start" />
-                                        <IonInput label="País" labelPlacement="floating" name="country" type="text" value={formData.country} onIonInput={handleInputChange} />
+                                        <IonSelect
+                                            label="País"
+                                            labelPlacement="floating"
+                                            name="country"
+                                            value={formData.country}
+                                            onIonChange={handleInputChange}
+                                        >
+                                            <IonSelectOption value="Mexico">México</IonSelectOption>
+                                        </IonSelect>
                                     </IonItem>
                                     {errors.country && <p className="error-message">{errors.country}</p>}
 

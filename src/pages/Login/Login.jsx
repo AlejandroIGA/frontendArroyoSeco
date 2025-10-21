@@ -66,7 +66,7 @@ const Login = () => {
         if (!formData.password) {
             newErrors.password = 'La contraseña es obligatoria.';
             isValid = false;
-        } else if (formData.password.length < 4) {
+        } else if (formData.password.length < 12) {
             newErrors.password = 'La contraseña debe tener al menos 4 caracteres.';
             isValid = false;
         }
