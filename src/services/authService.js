@@ -16,7 +16,10 @@ const authService = {
         }catch(error){
             throw error;
         }
-    } 
+    },
+    "getProfile": async () => {
+        console.log("To do...")
+    }
 }
 
 export default authService;
