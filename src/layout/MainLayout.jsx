@@ -35,13 +35,13 @@ const MainLayout = ({ children }) => {
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <IonContent fullscreen={true}>
-          <IonGrid>
-            <IonRow>
-              <IonCol size="4" size-md="3" className="ion-hide-md-down">
-                <Sidebar />
+        <IonContent fullscreen={true} scrollY={false}>
+          <IonGrid className="ion-h-100">
+            <IonRow className="ion-h-100">
+              <IonCol size="4" size-md="3" className="ion-hide-md-down sidebar-col">
+                <Sidebar activePage={activePage} />
               </IonCol>
-              <IonCol size="12" size-md="9">
+              <IonCol size="12" size-md="9" className="main-content-col">
                 {children}
               </IonCol>
             </IonRow>
