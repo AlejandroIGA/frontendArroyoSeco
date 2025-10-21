@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
     IonBackButton, IonList, IonItem, IonInput, IonButton,
     IonIcon, IonGrid, IonRow, IonCol,
-    IonRouterLink
+    IonRouterLink,
+    IonLoading, useIonToast, IonSelect, IonSelectOption
 } from '@ionic/react';
 import { personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
 import './Register.css'; // Usaremos un CSS idéntico al del login
@@ -13,15 +14,17 @@ import { useHistory } from 'react-router-dom';
 
 const RegisterPage = () => {
     const history = useHistory();
+    const [isLoading, setIsLoading] = useState(false);
+    const [presentToast] = useIonToast();
 
     // 1. Expandimos el estado para los nuevos campos
     const [formData, setFormData] = useState({
         name: '',
         lastName: '',
         phone: '',
-        country: '',
+        country: 'Mexico',
         email: '',
-        psw: ''
+        password: ''
     });
 
     // 2. Expandimos el estado de errores
@@ -31,21 +34,26 @@ const RegisterPage = () => {
         phone: '',
         country: '',
         email: '',
-        psw: ''
+        password: ''
     });
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+    const name = e.target.name || e.detail.name;
+    const value = e.detail.value !== undefined ? e.detail.value : e.target.value;
+
+    if (name) {
         setFormData(prev => ({ ...prev, [name]: value }));
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
-    };
+    }
+};
 
     // 3. Actualizamos la función de validación
     const validateForm = () => {
-        const newErrors = { name: '', lastName: '', phone: '', country: '', email: '', psw: '' };
+        const newErrors = { name: '', lastName: '', phone: '', country: '', email: '', password: '' };
         let isValid = true;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
 
         if (!formData.name) {
             newErrors.name = 'El nombre es obligatorio.';
@@ -57,6 +65,9 @@ const RegisterPage = () => {
         }
         if (!formData.phone) {
             newErrors.phone = 'El número de teléfono es obligatorio.';
+            isValid = false;
+        } else if (formData.phone.length > 14) {
+            newErrors.phone = 'El teléfono no debe exceder los 14 caracteres.';
             isValid = false;
         }
         if (!formData.country) {
@@ -70,11 +81,11 @@ const RegisterPage = () => {
             newErrors.email = 'El formato del correo no es válido.';
             isValid = false;
         }
-        if (!formData.psw) {
-            newErrors.psw = 'La contraseña es obligatoria.';
+        if (!formData.password) {
+            newErrors.password = 'La contraseña es obligatoria.';
             isValid = false;
-        } else if (formData.psw.length < 4) {
-            newErrors.psw = 'La contraseña debe tener al menos 6 caracteres.';
+        } else if (!passwordRegex.test(formData.password)) {
+            newErrors.password = 'Debe tener min. 12 caracteres, incluir mayúscula, minúscula, número y caracter especial (@$!%*?&).';
             isValid = false;
         }
 
@@ -85,20 +96,52 @@ const RegisterPage = () => {
     const handleRegister = async () => {
         setErrors(prev => ({ ...prev, api: '' }));
         if (validateForm()) {
-            await authService.register(formData)
-            setFormData({
-        name: '',
-        lastName: '',
-        phone: '',
-        country: '',
-        email: '',
-        psw: ''
-    });
-            history.push('/login')
-        } else {
-            setErrors(prev => ({ ...prev, api: 'Ocurrio un error al registrar los datos' }));
+            setIsLoading(true);
+            try {
+                await authService.register(formData)
+                setIsLoading(false);
+                setFormData({
+                    name: '',
+                    lastName: '',
+                    phone: '',
+                    country: '',
+                    email: '',
+                    password: ''
+                });
+                presentToast({
+                    message: '¡Registro exitoso! Serás redirigido al inicio de sesión.',
+                    duration: 5000,
+                    color: 'success',
+                    position: 'top'
+                });
+                setTimeout(() => {
+                    history.push('/login');
+                }, 5500);
+            } catch (error) {
+                setIsLoading(false);
+                if (error.code === "ERR_NETWORK") {
+                    setErrors(prev => ({ ...prev, api: 'Error de conexión.' }));
+                } else if (error.response?.status === 401) {
+                    console.log(error);
+                    setErrors(prev => ({ ...prev, api: error.response.data }));
+                } else {
+                    setErrors(prev => ({ ...prev, api: error.response.data }));
+                }
+            }
         }
     };
+
+    useEffect(() => {
+        setFormData({
+            name: '',
+            lastName: '',
+            phone: '',
+            country: '',
+            email: '',
+            password: ''
+        });
+        setErrors({ name: '', lastName: '', phone: '', country: '', email: '', password: '' });
+    }, [])
 
     return (
         <IonPage>
@@ -132,16 +175,24 @@ const RegisterPage = () => {
 
                                     <IonItem>
                                         <IonIcon icon={callOutline} slot="start" />
-                                        <IonInput label="Número de teléfono" labelPlacement="floating" name="phone" type="tel" value={formData.phone} onIonInput={handleInputChange} />
+                                        <IonInput label="Número de teléfono" labelPlacement="floating" name="phone" type="tel" value={formData.phone} onIonInput={handleInputChange} maxlength={14} />
                                     </IonItem>
                                     {errors.phone && <p className="error-message">{errors.phone}</p>}
 
                                     <IonItem>
                                         <IonIcon icon={earthOutline} slot="start" />
-                                        <IonInput label="País" labelPlacement="floating" name="country" type="text" value={formData.country} onIonInput={handleInputChange} />
+                                        <IonSelect
+                                            label="País"
+                                            labelPlacement="floating"
+                                            name="country"
+                                            value={formData.country}
+                                            onIonChange={handleInputChange}
+                                        >
+                                            <IonSelectOption value="Mexico">México</IonSelectOption>
+                                        </IonSelect>
                                     </IonItem>
                                     {errors.country && <p className="error-message">{errors.country}</p>}
-                                    
+
                                     {/* --- CAMPOS EXISTENTES --- */}
                                     <IonItem>
                                         <IonIcon icon={mailOutline} slot="start" />
@@ -151,11 +202,15 @@ const RegisterPage = () => {
 
                                     <IonItem>
                                         <IonIcon icon={lockClosedOutline} slot="start" />
-                                        <IonInput label="Contraseña" labelPlacement="floating" name="psw" type="password" value={formData.psw} onIonInput={handleInputChange} />
+                                        <IonInput label="Contraseña" labelPlacement="floating" name="password" type="password" value={formData.password} onIonInput={handleInputChange} />
                                     </IonItem>
-                                    {errors.psw && <p className="error-message">{errors.psw}</p>}
+                                    {errors.password && <p className="error-message">{errors.password}</p>}
                                 </IonList>
-
+                                {errors.api && (
+                                    <p className="error-message ion-text-center">
+                                        {errors.api}
+                                    </p>
+                                )}
                                 <IonButton expand="block" onClick={handleRegister} className="ion-margin-top">
                                     Registrar Cuenta
                                 </IonButton>
@@ -171,6 +226,12 @@ const RegisterPage = () => {
                     </IonRow>
                 </IonGrid>
             </IonContent>
+            <IonLoading
+                isOpen={isLoading}
+                onDidDismiss={() => setIsLoading(false)}
+                message={'Registrando su información...'}
+                duration={0}
+            />
         </IonPage>
     );
 };
