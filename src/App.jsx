@@ -22,6 +22,7 @@ import '@ionic/react/css/display.css';
 
 import './theme/variables.css';
 import UserProfile from './pages/UserProfile/UserProfile';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
 
 // Carga lenta de componentes (se carga cuando se utilicen lo que mejora rendimiento)
 const Home = React.lazy(() => import('./pages/Home/Home'));
@@ -43,7 +44,7 @@ function App() {
           <Route path="/login" exact component={Login}/>
           <Route path="/register" exact component={Register}/>
           <Route path="/reservation" exact component={Reservation}/>
-          <Route path="/user-dashboard/profile" exact component={UserProfile}/>
+          <Route path="/reset-password" exact component={ResetPassword}/>
         </IonRouterOutlet>
         </Suspense>
       </IonReactRouter>
