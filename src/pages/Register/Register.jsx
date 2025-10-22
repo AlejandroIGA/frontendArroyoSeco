@@ -21,7 +21,7 @@ const RegisterPage = () => {
     const [formData, setFormData] = useState({
         name: '',
         lastName: '',
-        phone: '',
+        cellphone: '',
         country: 'Mexico',
         email: '',
         password: ''
@@ -31,7 +31,7 @@ const RegisterPage = () => {
     const [errors, setErrors] = useState({
         name: '',
         lastName: '',
-        phone: '',
+        cellphone: '',
         country: '',
         email: '',
         password: ''
@@ -51,7 +51,7 @@ const RegisterPage = () => {
 
     // 3. Actualizamos la función de validación
     const validateForm = () => {
-        const newErrors = { name: '', lastName: '', phone: '', country: '', email: '', password: '' };
+        const newErrors = { name: '', lastName: '', cellphone: '', country: '', email: '', password: '' };
         let isValid = true;
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
 
@@ -63,11 +63,11 @@ const RegisterPage = () => {
             newErrors.lastName = 'Los apellidos son obligatorios.';
             isValid = false;
         }
-        if (!formData.phone) {
-            newErrors.phone = 'El número de teléfono es obligatorio.';
+        if (!formData.cellphone) {
+            newErrors.cellphone = 'El número de teléfono es obligatorio.';
             isValid = false;
-        } else if (formData.phone.length > 14) {
-            newErrors.phone = 'El teléfono no debe exceder los 14 caracteres.';
+        } else if (formData.cellphone.length > 14) {
+            newErrors.cellphone = 'El teléfono no debe exceder los 14 caracteres.';
             isValid = false;
         }
         if (!formData.country) {
@@ -103,10 +103,11 @@ const RegisterPage = () => {
                 setFormData({
                     name: '',
                     lastName: '',
-                    phone: '',
+                    cellphone: '',
                     country: '',
                     email: '',
-                    password: ''
+                    password: '',
+                    role: 'viajero'
                 });
                 presentToast({
                     message: '¡Registro exitoso! Serás redirigido al inicio de sesión.',
@@ -135,12 +136,12 @@ const RegisterPage = () => {
         setFormData({
             name: '',
             lastName: '',
-            phone: '',
+            cellphone: '',
             country: '',
             email: '',
             password: ''
         });
-        setErrors({ name: '', lastName: '', phone: '', country: '', email: '', password: '' });
+        setErrors({ name: '', lastName: '', cellphone: '', country: '', email: '', password: '' });
     }, [])
 
     return (
@@ -175,9 +176,9 @@ const RegisterPage = () => {
 
                                     <IonItem>
                                         <IonIcon icon={callOutline} slot="start" />
-                                        <IonInput label="Número de teléfono" labelPlacement="floating" name="phone" type="tel" value={formData.phone} onIonInput={handleInputChange} maxlength={14} />
+                                        <IonInput label="Número de teléfono" labelPlacement="floating" name="cellphone" type="tel" value={formData.cellphone} onIonInput={handleInputChange} maxlength={14} />
                                     </IonItem>
-                                    {errors.phone && <p className="error-message">{errors.phone}</p>}
+                                    {errors.cellphone && <p className="error-message">{errors.cellphone}</p>}
 
                                     <IonItem>
                                         <IonIcon icon={earthOutline} slot="start" />
