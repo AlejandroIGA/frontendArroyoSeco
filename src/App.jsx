@@ -46,6 +46,7 @@ function App() {
           <Route path="/reservation" exact component={Reservation}/>
           <Route path="/property" exact component={Property}/>
           <Route path="/reset-password" exact component={ResetPassword}/>
+          <Route path="/user-dashboard/profile" exact component={UserProfile}/>
         </IonRouterOutlet>
         </Suspense>
       </IonReactRouter>
