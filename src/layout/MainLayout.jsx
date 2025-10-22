@@ -15,7 +15,7 @@ import {
 } from '@ionic/react';
 import { arrowBack } from 'ionicons/icons';
 import Sidebar from '../components/Sidebar/Sidebar';
-const MainLayout = ({ children }) => {
+const MainLayout = ({ children, activePage }) => {
   return (
     <>
       <IonMenu contentId="main-layout-content">
