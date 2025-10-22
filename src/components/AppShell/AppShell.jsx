@@ -66,6 +66,8 @@ const AppShell = ({ children }) => {
                         <IonCol className="ion-hide-lg-down">
                             <SearchBar
                                 searchCriteria={searchCriteria}
+                                setShowEndDateModal={() => setShowEndDateModal(true)}
+                                setShowStartDateModal={() => setShowStartDateModal(true)}
                             />
                         </IonCol>
                         <IonCol className="ion-hide-lg-up ion-text-center">
