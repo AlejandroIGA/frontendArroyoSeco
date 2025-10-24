@@ -15,9 +15,9 @@ const Sidebar = () => {
 
     const menuItems = [
         { title: 'Perfil', path: '/user-dashboard/profile', icon: personCircleOutline, id: 'perfil' },
-        { title: 'Propiedades', path: '/property', icon: homeOutline, id: 'propiedades' },
-        { title: 'Reservaciones', path: '/reservation', icon: calendarOutline, id: 'reservaciones' },
-        { title: 'Pagos', path: '/payment', icon: cardOutline, id: 'pagos' }
+        { title: 'Propiedades', path: '/user-dashboard/property', icon: homeOutline, id: 'propiedades' },
+        { title: 'Reservaciones', path: '/user-dashboard/reservation', icon: calendarOutline, id: 'reservaciones' },
+        { title: 'Pagos', path: '/user-dashboard/payment', icon: cardOutline, id: 'pagos' }
     ];
 
     const handleMenuClick = async () => {

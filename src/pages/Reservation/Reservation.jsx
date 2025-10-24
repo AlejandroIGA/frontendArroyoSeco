@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonButtons,
-  IonMenuButton,
-  IonBackButton,
   IonSegment,
   IonSegmentButton,
   IonLabel,
@@ -18,98 +10,141 @@ import {
   IonCardSubtitle,
   IonCardContent,
   IonButton,
-  IonMenu,
-  IonGrid,
-  IonRow,
-  IonCol,
+  IonLoading,
+  IonSpinner,
 } from "@ionic/react";
-
-// Componentes
-import Sidebar from "../../components/Sidebar/Sidebar";
 import "./Reservation.css";
 import MainLayout from "../../layout/MainLayout";
+import bookingService from "../../services/bookingService";
+import propertyService from "../../services/propertyService"; 
+const formatDate = (dateStr) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
 const Reservaciones = () => {
-  const [reservations] = useState([
-    {
-      id: 1,
-      property: "Casa Buena",
-      dates: "15 de Dic, 2023 - 22 de Dic, 2023",
-      status: "Confirmada",
-    },
-    {
-      id: 2,
-      property: "Cabaña",
-      dates: "10 de Ene, 2024 - 15 de Ene, 2024",
-      status: "Pendiente",
-    },
-    {
-      id: 3,
-      property: "Departamento Moderno",
-      dates: "01 de Feb, 2024 - 05 de Feb, 2024",
-      status: "Rechazada",
-    },
-  ]);
-  const [selectedStatus, setSelectedStatus] = useState("Pendiente");
+  const [allReservations, setAllReservations] = useState([]);
+  const [propertiesMap, setPropertiesMap] = useState(new Map());
   const [filteredReservations, setFilteredReservations] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState("pendiente");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    setFilteredReservations(
-      reservations.filter((res) => res.status === selectedStatus)
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const [bookingResponse, propertyResponse] = await Promise.all([
+          bookingService.getAll(),
+          propertyService.getAll(),
+        ]);
+        setAllReservations(bookingResponse.data || []);
+        const propMap = new Map();
+        (propertyResponse.data || []).forEach((prop) => {
+          propMap.set(prop.id, prop.name);
+        });
+        setPropertiesMap(propMap);
+      } catch (err) {
+        console.error("Error cargando datos:", err);
+        setError("No se pudieron cargar los datos (reservaciones o propiedades).");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+  useEffect(() => {
+    const filtered = allReservations.filter(
+      (res) => res.status.toLowerCase() === selectedStatus
     );
-  }, [selectedStatus, reservations]);
-
-  const renderContent = () => (
-    <div className="content-container ion-padding">
-      <h2>Mis Reservaciones</h2>
-      <IonSegment
-        value={selectedStatus}
-        onIonChange={(e) => setSelectedStatus(e.detail.value)}
-      >
-        {["Rechazada", "Pendiente", "Confirmada"].map((status) => (
-          <IonSegmentButton key={status} value={status}>
-            <IonLabel>{status}</IonLabel>
-          </IonSegmentButton>
-        ))}
-      </IonSegment>
-      <IonList>
-        {filteredReservations.length > 0 ? (
-          filteredReservations.map((res) => (
-            <IonCard key={res.id} className="reservation-card">
-              <IonCardHeader>
-                <IonCardTitle>{res.property}</IonCardTitle>
-                <IonCardSubtitle>{res.dates}</IonCardSubtitle>
-              </IonCardHeader>
-              <IonCardContent>
-                <p>
-                  Estado:{" "}
-                  <span className={`status-${res.status.toLowerCase()}`}>
-                    {res.status}
-                  </span>
-                </p>
-                <IonButton
-                  routerLink={`/reservacion/${res.id}`}
-                  fill="clear"
-                  size="small"
-                  className="details-button"
-                >
-                  Ver Detalles
-                </IonButton>
-              </IonCardContent>
-            </IonCard>
-          ))
-        ) : (
-          <div className="no-reservations-message">
-            <p>No tienes reservaciones en este estado.</p>
-          </div>
-        )}
-      </IonList>
-    </div>
-  );
-
+    const transformed = filtered.map((res) => {
+      const propertyName = propertiesMap.get(res.id) || `Propiedad #${res.property_id}`;
+      return {
+        id: res.id,
+        property: propertyName,
+        dates: `${formatDate(res.startDate)} - ${formatDate(res.endDate)}`,
+        status: res.status.charAt(0).toUpperCase() + res.status.slice(1),
+      };
+    });
+    setFilteredReservations(transformed);
+  }, [selectedStatus, allReservations, propertiesMap]);
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="loading-container">
+          <IonSpinner name="crescent" />
+          <p>Cargando reservaciones...</p>
+        </div>
+      );
+    }
+    if (error) {
+      return (
+        <div className="error-message ion-padding">
+          <p>{error}</p>
+        </div>
+      );
+    }
+    return (
+      <div className="content-container ion-padding">
+        <h2>Mis Reservaciones</h2>
+        <IonSegment
+          value={selectedStatus}
+          onIonChange={(e) => setSelectedStatus(e.detail.value)}
+        >
+          {[
+            { value: "rechazada", label: "Rechazada" },
+            { value: "pendiente", label: "Pendiente" },
+            { value: "confirmada", label: "Confirmada" },
+          ].map((status) => (
+            <IonSegmentButton key={status.value} value={status.value}>
+              <IonLabel>{status.label}</IonLabel>
+            </IonSegmentButton>
+          ))}
+        </IonSegment>
+        <IonList>
+          {filteredReservations.length > 0 ? (
+            filteredReservations.map((res) => (
+              <IonCard key={res.id} className="reservation-card">
+                <IonCardHeader>
+                  <IonCardTitle>{res.property}</IonCardTitle>
+                  <IonCardSubtitle>{res.dates}</IonCardSubtitle>
+                </IonCardHeader>
+                <IonCardContent>
+                  <p>
+                    Estado:{" "}
+                    <span className={`status-${res.status.toLowerCase()}`}>
+                      {res.status}
+                    </span>
+                  </p>
+                  <IonButton
+                    routerLink={`/reservacion/${res.id}`}
+                    fill="clear"
+                    size="small"
+                    className="details-button"
+                  >
+                    Ver Detalles
+                  </IonButton>
+                </IonCardContent>
+              </IonCard>
+            ))
+          ) : (
+            <div className="no-reservations-message">
+              <p>No tienes reservaciones en este estado.</p>
+            </div>
+          )}
+        </IonList>
+      </div>
+    );
+  };
   return (
-<MainLayout pageTitle="Mis Reservaciones" activePage="reservaciones">
-   {renderContent()}
-</MainLayout>
+    <MainLayout pageTitle="Mis Reservaciones" activePage="reservaciones">
+      <IonLoading isOpen={isLoading} message={"Cargando..."} />
+      {!isLoading && renderContent()}
+    </MainLayout>
   );
 };
 export default Reservaciones;
