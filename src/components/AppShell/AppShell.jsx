@@ -149,7 +149,7 @@ const AppShell = ({ children }) => {
                         {
                             localStorage.getItem("isSessionActive") ?
                             <>
-                                <IonItem button={true} detail={false} routerLink="/reservation">
+                                <IonItem button={true} detail={false} routerLink="/user-dashboard/profile">
                                     <IonIcon slot="start" icon={personCircleOutline} />
                                     <IonLabel>Panel de usuario</IonLabel>
                                 </IonItem>
