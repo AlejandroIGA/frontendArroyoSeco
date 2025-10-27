@@ -30,7 +30,9 @@ const Login = React.lazy(() => import('./pages/Login/Login'));
 const Register = React.lazy(() => import('./pages/Register/Register'));
 const Reservation = React.lazy(() => import('./pages/Reservation/Reservation'));
 const Property = React.lazy(() => import('./pages/Property/Property'));
+const PropertyDetails = React.lazy(() => import('./pages/PropertyDetails/PropertyDetails')); 
 setupIonicReact();
+
 
 function App() {
   
@@ -47,6 +49,7 @@ function App() {
           <Route path="/user-dashboard/property" exact component={Property}/>
           <Route path="/reset-password" exact component={ResetPassword}/>
           <Route path="/user-dashboard/profile" exact component={UserProfile}/>
+          <Route path="/propiedad/:id" exact component={PropertyDetails} />
         </IonRouterOutlet>
         </Suspense>
       </IonReactRouter>
