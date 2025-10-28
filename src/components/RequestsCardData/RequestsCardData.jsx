@@ -1,85 +1,106 @@
 import React, { useState, useEffect } from "react";
-import {
-    IonSegment,
-    IonSegmentButton,
-    IonLabel,
-    IonList,
-    IonCard,
-    IonCardHeader,
-    IonCardSubtitle,
-    IonCardContent,
-    IonButton,
-    IonIcon,
-    IonItem,
-    IonAvatar,
-    IonSpinner,
-    IonContent 
-} from "@ionic/react";
+import { IonSegment, IonSegmentButton, IonLabel, IonList, IonCard, IonCardHeader, IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonItem, IonSpinner, IonContent } from "@ionic/react";
 import { checkmarkCircle, closeCircle } from 'ionicons/icons';
 import bookingService from "../../services/bookingService";
+import propertyService from "../../services/propertyService";
 import "./RequestsCardData.css";
-
-const mapApiToView = (dto) => {
-    console.log(dto);
-    const formatDate = (dateStr) => {
-        if (!dateStr) return '';
-        return new Date(dateStr).toLocaleDateString('es-ES', {
-            day: '2-digit', month: 'short', year: 'numeric'
-        });
-    };
-
-    const normalizeStatus = (status) => {
-        if (!status) return 'Pendiente';
-        const lowerStatus = status.toLowerCase();
-        return lowerStatus.charAt(0).toUpperCase() + lowerStatus.slice(1);
-    };
-
-    return {
-        id: dto.id,
-        guestName: dto.user_id?.name || 'Huésped Anónimo',
-        property: dto.property_id?.name || 'Propiedad Desconocida',
-        dates: `${formatDate(dto.startDate)} - ${formatDate(dto.endDate)}`,
-        status: normalizeStatus(dto.status),
-        guestImage: dto.user?.profileImage || `https://i.pravatar.cc/150?u=${dto.user?.id || dto.id}`
-    };
-};
 const RequestsCardData = () => {
     const [requests, setRequests] = useState([]);
     const [filter, setFilter] = useState('Pendiente');
     const [filteredRequests, setFilteredRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    
+    const [isUpdating, setIsUpdating] = useState(null);
+
     useEffect(() => {
         const loadRequests = async () => {
             try {
                 setIsLoading(true);
                 setError(null);
-                const response = await bookingService.getAll();
-                const mappedData = response.data.map(mapApiToView);
+                const ownerId = localStorage.getItem("userId");
+                if (!ownerId) {
+                    setError("No se pudo identificar al propietario. Por favor, inicie sesión.");
+                    setIsLoading(false);
+                    return;
+                }
+                const [bookingResponse, propertyResponse] = await Promise.all([
+                    bookingService.getAll(),
+                    propertyService.getAll()
+                ]);
+                const allBookings = bookingResponse.data || [];
+                const allProperties = propertyResponse.data || [];
+                const myPropertyIds = new Set();
+                const propertyNameMap = new Map();
+                allProperties.forEach(prop => {
+                    if (String(prop.ownerId).trim() === ownerId.trim()) {
+                        myPropertyIds.add(prop.id);
+                    }
+                    propertyNameMap.set(prop.id, prop.name);
+                });
+                const myPropertyBookings = allBookings.filter(booking =>
+                    myPropertyIds.has(booking.propertyId)
+                );
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '';
+                    return new Date(dateStr).toLocaleDateString('es-ES', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                    });
+                };
+                const normalizeStatus = (status) => {
+                    if (!status) return 'Pendiente';
+                    const lowerStatus = status.toLowerCase();
+                    return lowerStatus.charAt(0).toUpperCase() + lowerStatus.slice(1);
+                };
+                const mappedData = myPropertyBookings.map(dto => {
+                    const user = dto.user;
+                    let guestName = '';
+                    const profile = user?.userProfile;
+                    if (profile) {
+                        const firstName = profile.name || '';
+                        const lastName = profile.lastName || '';
+                        guestName = `${firstName} ${lastName}`.trim();
+                    }
+                    if (!guestName) {
+                        guestName = user?.email || `Usuario #${user?.id || 'Desconocido'}`;
+                    }
+                    return {
+                        id: dto.id,
+                        guestName: guestName,
+                        property: propertyNameMap.get(dto.propertyId) || 'Propiedad Desconocida',
+                        dates: `${formatDate(dto.startDate)} - ${formatDate(dto.endDate)}`,
+                        status: normalizeStatus(dto.status),
+                    };
+                });
                 setRequests(mappedData);
-                console.log(mappedData);
             } catch (err) {
                 console.error("Error al cargar las reservas:", err);
-                setError("No se pudieron cargar las solicitudes. Intenta de nuevo.");
             } finally {
                 setIsLoading(false);
             }
         };
         loadRequests();
     }, []);
+
     useEffect(() => {
         setFilteredRequests(requests.filter(req => req.status === filter));
     }, [filter, requests]);
-    const handleAccept = (id) => {
-        setRequests(currentRequests =>
-            currentRequests.map(req => req.id === id ? { ...req, status: 'Aceptada' } : req)
-        );
-    };
-    const handleReject = (id) => {
-        setRequests(currentRequests =>
-            currentRequests.map(req => req.id === id ? { ...req, status: 'Rechazada' } : req)
-        );
+    const handleUpdateStatus = async (id, newStatus) => {
+        const requestDTO = { status: newStatus };
+        setIsUpdating(id);
+        setError(null);
+        try {
+            await bookingService.updateBooking(id, requestDTO);
+            setRequests(currentRequests =>
+                currentRequests.map(req =>
+                    req.id === id ? { ...req, status: newStatus } : req
+                )
+            );
+        } catch (err) {
+            console.error(`Error al actualizar el estado a "${newStatus}":`, err);
+            setError("No se pudo actualizar la solicitud. Intenta de nuevo.");
+        } finally {
+            setIsUpdating(null);
+        }
     };
     if (isLoading) {
         return (
@@ -105,26 +126,42 @@ const RequestsCardData = () => {
             </IonSegment>
             <IonList>
                 {filteredRequests.length > 0 ? (
-                    filteredRequests.map((request) => (
-                        <IonCard key={request.id} className="request-card">
-                            <IonCardHeader>
-                                <IonItem lines="none" className="guest-item">
-                                    <IonAvatar slot="start"><img src={request.guestImage} alt="Huésped" /></IonAvatar>
-                                    <IonLabel>
-                                        <h2>Solicitud de: <strong>{request.guestName}</strong></h2>
-                                        <p>Propiedad: {request.property}</p>
-                                    </IonLabel>
-                                </IonItem>
-                                <IonCardSubtitle className="ion-padding-start">{request.dates}</IonCardSubtitle>
-                            </IonCardHeader>
-                            {request.status === 'Pendiente' && (
-                                <IonCardContent className="actions-container">
-                                    <IonButton fill="outline" color="danger" onClick={() => handleReject(request.id)}><IonIcon slot="start" icon={closeCircle} />Rechazar</IonButton>
-                                    <IonButton color="success" onClick={() => handleAccept(request.id)}><IonIcon slot="start" icon={checkmarkCircle} />Aceptar</IonButton>
-                                </IonCardContent>
-                            )}
-                        </IonCard>
-                    ))
+                    filteredRequests.map((request) => {
+                        const isThisCardUpdating = isUpdating === request.id;
+                        return (
+                            <IonCard key={request.id} className="request-card">
+                                <IonCardHeader>
+                                    <IonItem lines="none" className="guest-item">
+                                        <IonLabel>
+                                            <h2>Solicitud de: <strong>{request.guestName}</strong></h2>
+                                            <p>Propiedad: {request.property}</p>
+                                        </IonLabel>
+                                    </IonItem>
+                                    <IonCardSubtitle className="ion-padding-start">{request.dates}</IonCardSubtitle>
+                                </IonCardHeader>
+                                {request.status === 'Pendiente' && (
+                                    <IonCardContent className="actions-container">
+                                        <IonButton fill="outline" color="danger" onClick={() => handleUpdateStatus(request.id, 'Rechazada')} disabled={isThisCardUpdating}>
+                                            {isThisCardUpdating ? (
+                                                <IonSpinner name="dots" />
+                                            ) : (
+                                                <IonIcon slot="start" icon={closeCircle} />
+                                            )}
+                                            Rechazar
+                                        </IonButton>
+                                        <IonButton color="success" onClick={() => handleUpdateStatus(request.id, 'Aceptada')} disabled={isThisCardUpdating}>
+                                            {isThisCardUpdating ? (
+                                                <IonSpinner name="dots" />
+                                            ) : (
+                                                <IonIcon slot="start" icon={checkmarkCircle} />
+                                            )}
+                                            Aceptar
+                                        </IonButton>
+                                    </IonCardContent>
+                                )}
+                            </IonCard>
+                        )
+                    })
                 ) : (
                     <div className="no-requests-message"><p>No hay solicitudes en este estado.</p></div>
                 )}
