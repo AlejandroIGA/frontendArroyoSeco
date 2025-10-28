@@ -69,7 +69,7 @@ const Reservaciones = () => {
       (res) => res.status.toLowerCase() === selectedStatus
     );
     const transformed = filtered.map((res) => {
-      const propertyName = propertiesMap.get(res.id) || `Propiedad #${res.property_id}`;
+     const propertyName = propertiesMap.get(Number(res.propertyId)) || `Propiedad #${res.propertyId}`;
       return {
         id: res.id,
         property: propertyName,
