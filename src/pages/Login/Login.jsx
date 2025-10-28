@@ -74,27 +74,34 @@ const Login = () => {
         setErrors(newErrors);
         return isValid;
     };
-
     const handleLogin = async () => {
         setErrors(prev => ({ ...prev, api: '' }));
         if (validateForm()) {
             setIsLoading(true);
             try {
-                await authService.login(formData)
+                const response = await authService.login(formData);
+                const { id, rol } = response.data; // Extraemos id y rol
                 setIsLoading(false);
                 setFormData({ email: '', password: '' });
-                localStorage.setItem("isSessionActive", true);
+                localStorage.setItem("isSessionActive", "true");
+                localStorage.setItem("userId", id);
+                localStorage.setItem("userRole", rol);
                 history.push('/');
             } catch (error) {
                 setIsLoading(false);
-                if (error.code === "ERR_NETWORK") {
-                setErrors(prev => ({ ...prev, api: 'Error de conexión.' }));
-            } else if (error.response?.status === 401) {
-                console.log(error);
-                setErrors(prev => ({ ...prev, api: error.response.data }));
-            } else {
-                setErrors(prev => ({ ...prev, api: error.response.data }));
-            }
+                if (error.response) {
+                    if (error.response.status === 401) {
+                        console.log(error);
+                        setErrors(prev => ({ ...prev, api: error.response.data }));
+                    } else {
+                        setErrors(prev => ({ ...prev, api: error.response.data }));
+                    }
+                } else if (error.code === "ERR_NETWORK") {
+                    setErrors(prev => ({ ...prev, api: 'Error de conexión.' }));
+                } else {
+                    console.error("Error inesperado:", error);
+                    setErrors(prev => ({ ...prev, api: 'Ocurrió un error en la aplicación.' }));
+                }
             }
         }
     };
