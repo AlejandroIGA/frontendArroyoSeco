@@ -75,6 +75,8 @@ const AppShell = ({ children, onSearchResults }) => {
 
     const handleLogOut = () => {
         localStorage.removeItem("isSessionActive");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userRole");
         window.location.reload();
     }
 

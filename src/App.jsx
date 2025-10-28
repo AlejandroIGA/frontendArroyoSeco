@@ -1,4 +1,4 @@
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import React, {Suspense} from 'react';
 
 //Ionic Imports
@@ -21,8 +21,7 @@ import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
 import './theme/variables.css';
-import UserProfile from './pages/UserProfile/UserProfile';
-import ResetPassword from './pages/ResetPassword/ResetPassword';
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 
 // Carga lenta de componentes (se carga cuando se utilicen lo que mejora rendimiento)
 const Home = React.lazy(() => import('./pages/Home/Home'));
@@ -31,6 +30,8 @@ const Register = React.lazy(() => import('./pages/Register/Register'));
 const Reservation = React.lazy(() => import('./pages/Reservation/Reservation'));
 const Property = React.lazy(() => import('./pages/Property/Property'));
 const PropertyDetails = React.lazy(() => import('./pages/PropertyDetails/PropertyDetails')); 
+const UserProfile = React.lazy(() => import('./pages/UserProfile/UserProfile'));
+const ResetPassword = React.lazy(() => import('./pages/ResetPassword/ResetPassword'));
 setupIonicReact();
 
 
@@ -42,14 +43,17 @@ function App() {
       <IonReactRouter>
         <Suspense fallback={<IonSpinner name="crescent"/> }>
           <IonRouterOutlet>
+            
           <Route path="/" exact component={Home}/>
           <Route path="/login" exact component={Login}/>
           <Route path="/register" exact component={Register}/>
-          <Route path="/user-dashboard/reservation" exact component={Reservation}/>
-          <Route path="/user-dashboard/property" exact component={Property}/>
-          <Route path="/reset-password" exact component={ResetPassword}/>
-          <Route path="/user-dashboard/profile" exact component={UserProfile}/>
           <Route path="/propiedad/:id" exact component={PropertyDetails} />
+          <Route path="/reset-password" exact component={ResetPassword}/>
+
+          <PrivateRoute path="/user-dashboard/reservation" exact component={Reservation}/>
+          <PrivateRoute path="/user-dashboard/property" exact component={Property}/>
+          <PrivateRoute path="/user-dashboard/profile" exact component={UserProfile}/>
+                    
         </IonRouterOutlet>
         </Suspense>
       </IonReactRouter>
