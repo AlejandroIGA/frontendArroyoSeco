@@ -7,8 +7,9 @@ import './AppShell.css'
 import SearchBar from "../SearchBar/SearchBar";
 import { useState } from "react";
 import MobileSearchModal from "../MobileSearchModal/MobileSearchModal";
-
-const AppShell = ({ children }) => {
+import propertyService from "../../services/propertyService";
+import bookingService from "../../services/bookingService";
+const AppShell = ({ children, onSearchResults }) => {
 
     const [searchCriteria, setSearchCriteria] = useState({
         guests: '',
@@ -23,7 +24,7 @@ const AppShell = ({ children }) => {
     const handleDateChange = (e, field) => {
         const value = e.detail.value.split('T')[0]; // Formato YYYY-MM-DD
         setSearchCriteria(prev => ({ ...prev, [field]: value }));
-        
+
         if (field === 'startDate') setShowStartDateModal(false);
         if (field === 'endDate') setShowEndDateModal(false);
     };
@@ -32,14 +33,42 @@ const AppShell = ({ children }) => {
         const { name, value } = e.target;
         setSearchCriteria(prev => ({ ...prev, [name]: value }));
     };
-
-    const handleSearch = () => {
-        console.log("Buscando con:", searchCriteria);
-        setShowSearchModal(false); // Cierra el modal si estaba abierto
+    const handleSearch = async () => {
+        try {
+            const propertyParams = {
+                numberOfGuests: searchCriteria.guests || undefined,
+                maxPrice: searchCriteria.price || undefined,
+            };
+            const propertyResponse = await propertyService.searchProperties(propertyParams);
+            let allMatchingProperties = propertyResponse.data;
+            if (searchCriteria.startDate && searchCriteria.endDate) {
+                const bookingParams = {
+                    startDate: searchCriteria.startDate,
+                    endDate: searchCriteria.endDate,
+                };
+                const bookingResponse = await bookingService.searchBookings(bookingParams);
+                const conflictingBookings = bookingResponse.data; // Array de reservas
+                const conflictingPropertyIds = new Set();
+                conflictingBookings.forEach(booking => {
+                    if (booking.propertyId) {
+                        conflictingPropertyIds.add(booking.propertyId);
+                    } else if (booking.property && booking.property.id) {
+                        conflictingPropertyIds.add(booking.property.id);
+                    }
+                });
+                allMatchingProperties = allMatchingProperties.filter(property =>
+                    !conflictingPropertyIds.has(property.id)
+                );
+            }
+            if (onSearchResults) {
+                onSearchResults(allMatchingProperties);
+            }
+            setShowSearchModal(false);
+        } catch (error) {
+            console.error("Error al buscar propiedades:", error);
+        }
     };
-
     const [popoverState, setPopoverState] = useState({ showPopover: false, event: undefined });
-
     useIonViewWillLeave(() => {
         setPopoverState({ showPopover: false, event: undefined });
     });
@@ -66,8 +95,10 @@ const AppShell = ({ children }) => {
                         <IonCol className="ion-hide-lg-down">
                             <SearchBar
                                 searchCriteria={searchCriteria}
+                                handleInputChange={handleInputChange}
                                 setShowEndDateModal={() => setShowEndDateModal(true)}
                                 setShowStartDateModal={() => setShowStartDateModal(true)}
+                                handleSearch={handleSearch}
                             />
                         </IonCol>
                         <IonCol className="ion-hide-lg-up ion-text-center">
@@ -109,12 +140,12 @@ const AppShell = ({ children }) => {
                 setShowEndDateModal={setShowEndDateModal}
             />
 
-            <IonModal 
-                isOpen={showStartDateModal} 
+            <IonModal
+                isOpen={showStartDateModal}
                 onDidDismiss={() => setShowStartDateModal(false)}
                 className="date-modal"
             >
-                <IonDatetime 
+                <IonDatetime
                     onIonChange={(e) => handleDateChange(e, 'startDate')}
                     presentation="date"
                     showDefaultButtons={true}
@@ -123,12 +154,12 @@ const AppShell = ({ children }) => {
                 />
             </IonModal>
 
-            <IonModal 
-                isOpen={showEndDateModal} 
+            <IonModal
+                isOpen={showEndDateModal}
                 onDidDismiss={() => setShowEndDateModal(false)}
                 className="date-modal"
             >
-                <IonDatetime 
+                <IonDatetime
                     onIonChange={(e) => handleDateChange(e, 'endDate')}
                     presentation="date"
                     showDefaultButtons={true}
@@ -148,15 +179,15 @@ const AppShell = ({ children }) => {
                     <IonList>
                         {
                             localStorage.getItem("isSessionActive") ?
-                            <>
-                                <IonItem button={true} detail={false} routerLink="/user-dashboard/profile">
-                                    <IonIcon slot="start" icon={personCircleOutline} />
-                                    <IonLabel>Panel de usuario</IonLabel>
-                                </IonItem>
-                                <IonItem button={true} detail={false} onClick={handleLogOut}>
-                                    <IonIcon slot="start" icon={logInOutline} />
-                                    <IonLabel>Cerrar Sesión</IonLabel>
-                                </IonItem>
+                                <>
+                                    <IonItem button={true} detail={false} routerLink="/user-dashboard/profile">
+                                        <IonIcon slot="start" icon={personCircleOutline} />
+                                        <IonLabel>Panel de usuario</IonLabel>
+                                    </IonItem>
+                                    <IonItem button={true} detail={false} onClick={handleLogOut}>
+                                        <IonIcon slot="start" icon={logInOutline} />
+                                        <IonLabel>Cerrar Sesión</IonLabel>
+                                    </IonItem>
                                 </>
                                 :
                                 <>

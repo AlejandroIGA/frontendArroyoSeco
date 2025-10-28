@@ -16,7 +16,7 @@ import {
 import "./Reservation.css";
 import MainLayout from "../../layout/MainLayout";
 import bookingService from "../../services/bookingService";
-import propertyService from "../../services/propertyService"; 
+import propertyService from "../../services/propertyService";
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   return new Date(dateStr).toLocaleDateString("es-ES", {
@@ -38,10 +38,17 @@ const Reservaciones = () => {
       try {
         setIsLoading(true);
         setError(null);
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          setError("No se pudo identificar al usuario. Por favor, inicie sesión de nuevo.");
+          setIsLoading(false);
+          return; 
+        }
         const [bookingResponse, propertyResponse] = await Promise.all([
-          bookingService.getAll(),
+          bookingService.searchBookings({ userId: userId }),
           propertyService.getAll(),
         ]);
+
         setAllReservations(bookingResponse.data || []);
         const propMap = new Map();
         (propertyResponse.data || []).forEach((prop) => {
@@ -98,7 +105,7 @@ const Reservaciones = () => {
           {[
             { value: "rechazada", label: "Rechazada" },
             { value: "pendiente", label: "Pendiente" },
-            { value: "confirmada", label: "Confirmada" },
+            { value: "aceptada", label: "Aceptada" },
           ].map((status) => (
             <IonSegmentButton key={status.value} value={status.value}>
               <IonLabel>{status.label}</IonLabel>
