@@ -16,7 +16,7 @@ const UserProfile = () => {
     const [formData, setFormData] = useState({
         name: '',
         lastName: '',
-        phone: '',
+        cellphone: '',
         country: '',
         email: '',
     });
@@ -24,7 +24,7 @@ const UserProfile = () => {
     const [errors, setErrors] = useState({
         name: '',
         lastName: '',
-        phone: '',
+        cellphone: '',
         country: '',
         email: '',
     });
@@ -33,7 +33,8 @@ const UserProfile = () => {
         const fetchUserData = async () => {
             try {
                 const userData = await userService.getProfile();
-                //setFormData(userData);
+                console.log(userData);
+                setFormData(userData.data);
                 setIsLoading(false);
             } catch (error) {
                 console.error("Error al cargar el perfil:", error);
@@ -53,7 +54,7 @@ const UserProfile = () => {
     };
 
     const validateForm = () => {
-        const newErrors = { name: '', lastName: '', phone: '', country: '', email: '' };
+        const newErrors = { name: '', lastName: '', cellphone: '', country: '', email: '' };
         let isValid = true;
 
         if (!formData.name) {
@@ -64,8 +65,8 @@ const UserProfile = () => {
             newErrors.lastName = 'Los apellidos son obligatorios.';
             isValid = false;
         }
-        if (!formData.phone) {
-            newErrors.phone = 'El número de teléfono es obligatorio.';
+        if (!formData.cellphone) {
+            newErrors.cellphone = 'El número de teléfono es obligatorio.';
             isValid = false;
         }
         if (!formData.country) {
@@ -128,9 +129,9 @@ const UserProfile = () => {
 
                                     <IonItem>
                                         <IonIcon icon={callOutline} slot="start" />
-                                        <IonInput label="Número de teléfono" labelPlacement="floating" name="phone" type="tel" value={formData.phone} onIonInput={handleInputChange} />
+                                        <IonInput label="Número de teléfono" labelPlacement="floating" name="cellphone" type="tel" value={formData.cellphone} onIonInput={handleInputChange} />
                                     </IonItem>
-                                    {errors.phone && <p className="error-message">{errors.phone}</p>}
+                                    {errors.cellphone && <p className="error-message">{errors.cellphone}</p>}
 
                                     <IonItem>
                                         <IonIcon icon={earthOutline} slot="start" />
@@ -154,7 +155,7 @@ const UserProfile = () => {
                                     <IonButton onClick={handleUpdateProfile} className="ion-margin-top">
                                         Guardar Cambios
                                     </IonButton>
-                                    <IonButton fill="outline" routerLink="/change-password" className="ion-margin-top ion-margin-start">
+                                    <IonButton fill="outline" routerLink="/reset-password" className="ion-margin-top ion-margin-start">
                                         Cambiar Contraseña
                                     </IonButton>
                                 </div>
