@@ -6,7 +6,7 @@ import {
     IonRouterLink,
     IonLoading, useIonToast, IonSelect, IonSelectOption
 } from '@ionic/react';
-import { personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
+import { personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline, briefcaseOutline } from 'ionicons/icons';
 import './Register.css'; // Usaremos un CSS idéntico al del login
 import authService from '../../services/authService';
 
@@ -24,7 +24,8 @@ const RegisterPage = () => {
         cellphone: '',
         country: 'Mexico',
         email: '',
-        password: ''
+        password: '',
+        role: ''
     });
 
     // 2. Expandimos el estado de errores
@@ -34,7 +35,8 @@ const RegisterPage = () => {
         cellphone: '',
         country: '',
         email: '',
-        password: ''
+        password: '',
+        role: ''
     });
 
     const handleInputChange = (e) => {
@@ -51,7 +53,7 @@ const RegisterPage = () => {
 
     // 3. Actualizamos la función de validación
     const validateForm = () => {
-        const newErrors = { name: '', lastName: '', cellphone: '', country: '', email: '', password: '' };
+        const newErrors = { name: '', lastName: '', cellphone: '', country: '', email: '', password: '', role:'' };
         let isValid = true;
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
 
@@ -88,6 +90,10 @@ const RegisterPage = () => {
             newErrors.password = 'Debe tener min. 12 caracteres, incluir mayúscula, minúscula, número y caracter especial (@$!%*?&).';
             isValid = false;
         }
+        if (!formData.role){
+            newErrors.role = 'El role es obligatorio';
+            isValid = false;
+        }
 
         setErrors(newErrors);
         return isValid;
@@ -107,7 +113,7 @@ const RegisterPage = () => {
                     country: '',
                     email: '',
                     password: '',
-                    role: 'viajero'
+                    role: ''
                 });
                 presentToast({
                     message: '¡Registro exitoso! Serás redirigido al inicio de sesión.',
@@ -139,9 +145,10 @@ const RegisterPage = () => {
             cellphone: '',
             country: '',
             email: '',
-            password: ''
+            password: '',
+            role: ''
         });
-        setErrors({ name: '', lastName: '', cellphone: '', country: '', email: '', password: '' });
+        setErrors({ name: '', lastName: '', cellphone: '', country: '', email: '', password: '', role:'' });
     }, [])
 
     return (
@@ -193,8 +200,6 @@ const RegisterPage = () => {
                                         </IonSelect>
                                     </IonItem>
                                     {errors.country && <p className="error-message">{errors.country}</p>}
-
-                                    {/* --- CAMPOS EXISTENTES --- */}
                                     <IonItem>
                                         <IonIcon icon={mailOutline} slot="start" />
                                         <IonInput label="Correo Electrónico" labelPlacement="floating" name="email" type="email" value={formData.email} onIonInput={handleInputChange} />
@@ -207,6 +212,21 @@ const RegisterPage = () => {
                                     </IonItem>
                                     {errors.password && <p className="error-message">{errors.password}</p>}
                                 </IonList>
+                                <IonItem>
+                                        <IonIcon icon={briefcaseOutline} slot="start" />
+                                        <IonSelect
+                                            label="Tipo de Cuenta"
+                                            labelPlacement="floating"
+                                            name="role"
+                                            value={formData.role}
+                                            onIonChange={handleInputChange}
+                                            placeholder="Selecciona un tipo"
+                                        >
+                                            <IonSelectOption value="visitante">Visitante</IonSelectOption>
+                                            <IonSelectOption value="propietario">Propietario</IonSelectOption>
+                                        </IonSelect>
+                                    </IonItem>
+                                    {errors.role && <p className="error-message">{errors.role}</p>}
                                 {errors.api && (
                                     <p className="error-message ion-text-center">
                                         {errors.api}

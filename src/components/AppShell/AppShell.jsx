@@ -1,7 +1,7 @@
 import { IonButton, IonCol, IonContent, IonFooter, IonGrid, IonHeader, 
     IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRouterLink, 
     IonRow, useIonViewWillLeave, IonModal, IonDatetime } from "@ionic/react";
-import { personOutline, logInOutline, person, searchOutline, personCircleOutline } from 'ionicons/icons';
+import { personOutline, logInOutline, person, searchOutline, personCircleOutline, personAddOutline } from 'ionicons/icons';
 
 import './AppShell.css'
 import SearchBar from "../SearchBar/SearchBar";
@@ -159,10 +159,16 @@ const AppShell = ({ children }) => {
                                 </IonItem>
                                 </>
                                 :
+                                <>
                                 <IonItem button={true} detail={false} routerLink="/login">
                                     <IonIcon slot="start" icon={logInOutline} />
                                     <IonLabel>Iniciar Sesión</IonLabel>
                                 </IonItem>
+                                <IonItem button={true} detail={false} routerLink="/register">
+                                    <IonIcon slot="start" icon={personAddOutline} />
+                                    <IonLabel>Registrarse</IonLabel>
+                                </IonItem>
+                                </>
                         }
                     </IonList>
                 </IonContent>
