@@ -17,7 +17,8 @@ import {
     IonRow,
     IonCol,
     IonRouterLink,
-    IonLoading
+    IonLoading,
+    useIonToast
 } from '@ionic/react';
 
 import { mailOutline, lockClosedOutline } from 'ionicons/icons';
@@ -27,9 +28,11 @@ import authService from '../../services/authService.js';
 import { useHistory } from 'react-router-dom';
 
 const Login = () => {
+    let errorMsg = 'Ocurrió un error inesperado.';
 
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
+    const [presentToast] = useIonToast();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -53,7 +56,6 @@ const Login = () => {
         const newErrors = { email: '', password: '' };
         let isValid = true;
 
-        // Validación del correo
         if (!formData.email) {
             newErrors.email = 'El correo electrónico es obligatorio.';
             isValid = false;
@@ -62,7 +64,6 @@ const Login = () => {
             isValid = false;
         }
 
-        // Validación de la contraseña
         if (!formData.password) {
             newErrors.password = 'La contraseña es obligatoria.';
             isValid = false;
@@ -80,7 +81,7 @@ const Login = () => {
             setIsLoading(true);
             try {
                 const response = await authService.login(formData);
-                const { id, rol } = response.data; // Extraemos id y rol
+                const { id, rol } = response.data;
                 setIsLoading(false);
                 setFormData({ email: '', password: '' });
                 localStorage.setItem("isSessionActive", "true");
@@ -89,19 +90,25 @@ const Login = () => {
                 history.push('/');
             } catch (error) {
                 setIsLoading(false);
+                console.log("Este es el error del login", error);
                 if (error.response) {
                     if (error.response.status === 401) {
                         console.log(error);
-                        setErrors(prev => ({ ...prev, api: error.response.data }));
+                       errorMsg = "Credenciales incorrectas.";
                     } else {
-                        setErrors(prev => ({ ...prev, api: error.response.data }));
+                        errorMsg = "Error inesperado.";
                     }
                 } else if (error.code === "ERR_NETWORK") {
-                    setErrors(prev => ({ ...prev, api: 'Error de conexión.' }));
+                    errorMsg = 'Error de conexión.';
                 } else {
-                    console.error("Error inesperado:", error);
-                    setErrors(prev => ({ ...prev, api: 'Ocurrió un error en la aplicación.' }));
+                    errorMsg = 'Ocurrió un error en la aplicación.';
                 }
+                presentToast({
+                message: errorMsg,
+                duration: 3000,
+                color: 'danger',
+                position: 'top'
+            });
             }
         }
     };
@@ -154,11 +161,6 @@ const Login = () => {
                                     </IonItem>
                                     {errors.password && <p className="error-message">{errors.password}</p>}
                                 </IonList>
-                                {errors.api && (
-                                    <p className="error-message ion-text-center">
-                                        {errors.api}
-                                    </p>
-                                )}
                                 <IonButton
                                     expand="block"
                                     onClick={handleLogin}

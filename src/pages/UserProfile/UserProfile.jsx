@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
     IonBackButton, IonList, IonItem, IonInput, IonButton,
-    IonIcon, IonGrid, IonRow, IonCol, IonSpinner
+    IonIcon, IonGrid, IonRow, IonCol, IonSpinner,
+    useIonToast,
+    IonLoading
 } from '@ionic/react';
 import { personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
 import './UserProfile.css';
@@ -11,14 +13,16 @@ import authService from '../../services/authService';
 import MainLayout from '../../layout/MainLayout';
 
 const UserProfile = () => {
+    let errorMsg = 'Ocurrió un error inesperado.';
+    
     const [isLoading, setIsLoading] = useState(true);
+    const [presentToast] = useIonToast();
 
     const [formData, setFormData] = useState({
         name: '',
         lastName: '',
         cellphone: '',
         country: '',
-        email: '',
     });
 
     const [errors, setErrors] = useState({
@@ -26,22 +30,33 @@ const UserProfile = () => {
         lastName: '',
         cellphone: '',
         country: '',
-        email: '',
     });
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const userData = await userService.getProfile();
-                console.log(userData);
-                setFormData(userData.data);
-                setIsLoading(false);
-            } catch (error) {
-                console.error("Error al cargar el perfil:", error);
-                setIsLoading(false);
-            }
-        };
+    const fetchUserData = async () => {
+        setIsLoading(true);
+        try {
+            const userData = await userService.getProfile();
+            setFormData(userData.data);
+            setIsLoading(false);
+        } catch (error) {
+            setIsLoading(false);
+            if (error.response) {
+                    errorMsg = error.response.data?.message || error.response.data || 'Error del servidor.';
+                } else if (error.code === "ERR_NETWORK") {
+                    errorMsg = 'Error de conexión.';
+                } else if (error.message) {
+                    errorMsg = error.message;
+                }
+                presentToast({
+                message: errorMsg,
+                duration: 3000,
+                color: 'danger',
+                position: 'top'
+            });
+        }
+    };
 
+    useEffect(() => {
         fetchUserData();
     }, []);
 
@@ -54,7 +69,7 @@ const UserProfile = () => {
     };
 
     const validateForm = () => {
-        const newErrors = { name: '', lastName: '', cellphone: '', country: '', email: '' };
+        const newErrors = { name: '', lastName: '', cellphone: '', country: '' };
         let isValid = true;
 
         if (!formData.name) {
@@ -73,13 +88,6 @@ const UserProfile = () => {
             newErrors.country = 'El país es obligatorio.';
             isValid = false;
         }
-        if (!formData.email) {
-            newErrors.email = 'El correo es obligatorio.';
-            isValid = false;
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'El formato del correo no es válido.';
-            isValid = false;
-        }
         setErrors(newErrors);
         return isValid;
     };
@@ -87,24 +95,34 @@ const UserProfile = () => {
     const handleUpdateProfile = async () => {
         setErrors(prev => ({ ...prev, api: '' }));
         if (validateForm()) {
+            setIsLoading(true);
             try {
                 await userService.update(formData);
-                alert("Perfil actualizado con éxito");
+                presentToast({
+                    message: 'Su información ha sido actualizada',
+                    duration: 3000,
+                    color: 'success',
+                    position: 'top'
+                });
+                setIsLoading(false);
             } catch (error) {
-                setErrors(prev => ({ ...prev, api: 'Error al actualizar los datos.' }));
+                setIsLoading(false);
+                if (error.response) {
+                    errorMsg = error.response.data?.message || error.response.data || 'Error del servidor.';
+                } else if (error.code === "ERR_NETWORK") {
+                    errorMsg = 'Error de conexión.';
+                } else if (error.message) {
+                    errorMsg = error.message;
+                }
+                presentToast({
+                message: errorMsg,
+                duration: 3000,
+                color: 'danger',
+                position: 'top'
+            });
             }
         }
     };
-
-    if (isLoading) {
-        return (
-            <IonPage>
-                <IonContent fullscreen>
-                    <IonSpinner name="crescent" />
-                </IonContent>
-            </IonPage>
-        );
-    }
 
     return (
         <MainLayout pageTitle="Perfil" activePage="perfil">
@@ -138,18 +156,6 @@ const UserProfile = () => {
                                         <IonInput label="País" labelPlacement="floating" name="country" type="text" value={formData.country} onIonInput={handleInputChange} />
                                     </IonItem>
                                     {errors.country && <p className="error-message">{errors.country}</p>}
-
-                                    <IonItem>
-                                        <IonIcon icon={mailOutline} slot="start" />
-                                        <IonInput
-                                            label="Correo Electrónico"
-                                            labelPlacement="floating"
-                                            name="email"
-                                            type="email"
-                                            value={formData.email}
-                                            readonly={true}
-                                        />
-                                    </IonItem>
                                 </IonList>
                                 <div className="ion-text-center ion-padding-top">
                                     <IonButton onClick={handleUpdateProfile} className="ion-margin-top">
@@ -164,6 +170,12 @@ const UserProfile = () => {
                     </IonRow>
                 </IonGrid>
             }
+            <IonLoading
+                isOpen={isLoading}
+                onDidDismiss={() => setIsLoading(false)}
+                message={'Cargando...'}
+                duration={0}
+            />
         </MainLayout>
     );
 };
