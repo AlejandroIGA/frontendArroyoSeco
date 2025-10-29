@@ -9,17 +9,20 @@ on:
 jobs:
   run-test:
     runs-on: ubuntu-latest
+    
+    env:
+      K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+      K6_CLOUD_PROJECT_ID: ${{ secrets.K6_CLOUD_PROJECT_ID }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup K6
         uses: grafana/setup-k6-action@v1
-        env:
-          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-          K6_CLOUD_PROJECT_ID: ${{ secrets.K6_CLOUD_PROJECT_ID }}
+
       - name: List files in root
         run: ls -l
 
-      - name: Run local k6 test
-        run: k6 run test.js
+      - name: Run k6 cloud test
+        run: k6 cloud test.js
