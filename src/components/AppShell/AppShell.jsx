@@ -129,7 +129,20 @@ const AppShell = ({ children, onSearchResults }) => {
                 {children}
             </IonContent>
             <IonFooter>
-                <p style={{ textAlign: "center" }}>Todos los derechos reservados 2025</p>
+                <div className="ion-text-center ion-padding-vertical" style={{ fontSize: '0.9em', color: 'var(--ion-color-medium)' }}>
+                    <div>
+                        <IonRouterLink routerLink="/terms" color="medium" style={{ padding: '0 8px' }}>
+                            Términos y Condiciones
+                        </IonRouterLink>
+                        <span>|</span>
+                        <IonRouterLink routerLink="/privacy-policy" color="medium" style={{ padding: '0 8px' }}>
+                            Política de Privacidad
+                        </IonRouterLink>
+                    </div>
+                    <p style={{ margin: '8px 0 0 0' }}>
+                        Todos los derechos reservados 2025
+                    </p>
+                </div>
             </IonFooter>
 
             <MobileSearchModal

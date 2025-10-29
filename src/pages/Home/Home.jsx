@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid, IonPage, IonRow } from "@ionic/react"
+import { useHistory } from 'react-router-dom';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonModal, IonPage, IonRouterLink, IonRow, IonTitle, IonToolbar, useIonViewWillEnter } from "@ionic/react"
 import AppShell from "../../components/AppShell/AppShell"
 import PropertyCardData from "../../components/PropertyCardData/PropertyCardData"
 import apiClient from '../../../axiosConfig';
@@ -7,6 +8,9 @@ import apiClient from '../../../axiosConfig';
 const Home = () => {
     const [properties, setProperties] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const history = useHistory();
+    const [navigatingTo, setNavigatingTo] = useState(null);
 
     useEffect(() => {
         const fetchProperties = async () => {
@@ -31,6 +35,27 @@ const Home = () => {
         };
         fetchProperties();
     }, []);
+
+    useIonViewWillEnter(() => {
+        const hasAccepted = localStorage.getItem('hasAcceptedTerms') === 'true';
+        if (!hasAccepted) {
+            setShowTermsModal(true); 
+        }
+    });
+
+    const handleAcceptTerms = () => {
+        localStorage.setItem('hasAcceptedTerms', 'true');
+        setShowTermsModal(false);
+    };
+
+    const handleLinkClick = () => {
+        setShowTermsModal(false);
+    };
+
+    const handleNavigate = (path) => {
+        setNavigatingTo(path);
+        setShowTermsModal(false);
+    };
 
     const handleSearchResults = (results) => {
         if (Array.isArray(results)) {
@@ -92,6 +117,49 @@ const Home = () => {
                     </IonRow>
                 </IonGrid>
             </AppShell>
+            <IonModal 
+                isOpen={showTermsModal} 
+                backdropDismiss={false}
+                onDidDismiss={() => {
+                    if (navigatingTo) {
+                        history.push(navigatingTo);
+                        setNavigatingTo(null);
+                    }
+                }}
+                >
+                <IonHeader>
+                    <IonToolbar>
+                        <IonTitle>Bienvenido a SRAT</IonTitle>
+                    </IonToolbar>
+                </IonHeader>
+                <IonContent className="ion-padding">
+                    <h2>Aviso Importante</h2>
+                    <p>
+                        Para usar nuestra aplicación, debes leer y aceptar 
+                        nuestros Términos y Condiciones y nuestra Política de Privacidad.
+                    </p>
+
+                    <div className="ion-margin-vertical">
+                        <IonButton 
+                            fill="clear" 
+                            expand="block" 
+                            onClick={() => handleNavigate('/terms')}
+                        >
+                            <strong>Leer Términos y Condiciones</strong>
+                        </IonButton>
+                        <IonButton 
+                            fill="clear" 
+                            expand="block" 
+                            onClick={() => handleNavigate('/privacy-policy')}
+                        >
+                            <strong>Leer Política de Privacidad</strong>
+                        </IonButton>
+                    </div>
+                    <IonButton expand="block" onClick={handleAcceptTerms}>
+                        He leído y acepto los términos
+                    </IonButton>
+                </IonContent>
+            </IonModal>
         </IonPage>
     )
 }
