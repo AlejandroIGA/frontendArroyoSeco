@@ -32,6 +32,10 @@ const Property = React.lazy(() => import('./pages/Property/Property'));
 const PropertyDetails = React.lazy(() => import('./pages/PropertyDetails/PropertyDetails')); 
 const UserProfile = React.lazy(() => import('./pages/UserProfile/UserProfile'));
 const ResetPassword = React.lazy(() => import('./pages/ResetPassword/ResetPassword'));
+const PrivacyPoliciy = React.lazy(() => import('./pages/Legal/PrivacyPolicy'));
+const Terms = React.lazy(() => import('./pages/Legal/Terms'));
+
+
 setupIonicReact();
 
 
@@ -49,6 +53,8 @@ function App() {
           <Route path="/register" exact component={Register}/>
           <Route path="/propiedad/:id" exact component={PropertyDetails} />
           <Route path="/reset-password" exact component={ResetPassword}/>
+          <Route path="/privacy-policy" exact component={PrivacyPoliciy}/>
+          <Route path="/terms" exact component={Terms}/>
 
           <PrivateRoute path="/user-dashboard/reservation" exact component={Reservation}/>
           <PrivateRoute path="/user-dashboard/property" exact component={Property}/>
