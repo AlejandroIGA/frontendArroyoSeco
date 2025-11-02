@@ -23,7 +23,7 @@ import {
 import { cameraOutline, closeCircle } from 'ionicons/icons';
 
 // Define el número máximo de imágenes permitido
-const MAX_IMAGES = 5; 
+const MAX_IMAGES = 5;
 
 // Valores iniciales (se mantiene igual)
 const initialFormData = {
@@ -34,9 +34,20 @@ const initialFormData = {
     kidsAllowed: false,
     petsAllowed: false,
     showProperty: false,
-    location: { address: '' },
-    description: { fullDescription: '' },
-    imagen: [], 
+    location: {
+        calle: '',
+        colonia: '',
+        numero: '',
+        codigoPostal: ''
+    },
+    description: {
+        general: '',
+        internet: false,
+        camasIndividuales: 0,
+        camasMatrimoniales: 0,
+        lavado: false
+    },
+    imagen: [],
 };
 
 const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
@@ -59,59 +70,76 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                 showProperty: propertyData.showProperty || false,
                 location: propertyData.location || { address: '' },
                 description: propertyData.description || { fullDescription: '' },
-                imagen: propertyData.imagen || [], 
+                imagen: propertyData.imagen || [],
             });
-            setSelectedFiles([]); 
+            setSelectedFiles([]);
         } else {
             setFormData(initialFormData);
-            setSelectedFiles([]); 
+            setSelectedFiles([]);
         }
     }, [propertyData, isOpen]);
 
+    const handleNestedChange = (e) => {
+        const name = e.target.name;
+        const parent = e.target.dataset.parent;
+
+        const detail = e.detail;
+        let value;
+
+        if (detail.checked !== undefined) {
+            value = detail.checked;
+        } else {
+            value = detail.value;
+
+            const inputType = e.target.type;
+            if (inputType === 'number') {
+                value = value === '' ? 0 : parseInt(value, 10);
+            }
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            [parent]: {
+                ...prev[parent],
+                [name]: value
+            }
+        }));
+    };
+
     const handleChange = (e) => {
-        const { name, value, checked, type } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' || type === 'toggle' ? checked : value
-        }));
+        const name = e.target.name;
+        const detail = e.detail;
+
+        if (detail.checked !== undefined) {
+            setFormData(prev => ({
+                ...prev,
+                [name]: detail.checked
+            }));
+        }
+        else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: detail.value
+            }));
+        }
     };
 
-    const handleLocationChange = (e) => {
-        setFormData(prev => ({
-            ...prev,
-            location: {
-                ...prev.location,
-                address: e.detail.value
-            }
-        }));
-    };
-
-    const handleDescriptionChange = (e) => {
-        setFormData(prev => ({
-            ...prev,
-            description: {
-                ...prev.description,
-                fullDescription: e.detail.value
-            }
-        }));
-    };
-    
     const handleFileSelect = (e) => {
         const files = Array.from(e.target.files);
         const totalFiles = [...selectedFiles, ...files];
-        
+
         if (totalFiles.length > MAX_IMAGES) {
             const filesToAdd = MAX_IMAGES - selectedFiles.length;
             setSelectedFiles(prevFiles => [
-                ...prevFiles, 
+                ...prevFiles,
                 ...files.slice(0, filesToAdd)
             ]);
-            setShowAlert(true); 
+            setShowAlert(true);
         } else {
             setSelectedFiles(totalFiles);
         }
-        
-        e.target.value = null; 
+
+        e.target.value = null;
     };
 
     const handleRemoveFile = (indexToRemove) => {
@@ -126,9 +154,20 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
             return;
         }
 
+        const stringifyMapValues = (mapObject) => {
+            const newMap = {};
+            for (const key in mapObject) {
+                newMap[key] = JSON.stringify(mapObject[key]);
+            }
+            return newMap;
+        };
+
         const dataToSave = {
             ...formData,
+            location: stringifyMapValues(formData.location),
+            description: stringifyMapValues(formData.description),
             newImages: selectedFiles,
+            ownerId: localStorage.getItem('userId')
         };
 
         onSave(dataToSave);
@@ -151,20 +190,20 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
             <IonContent className="ion-padding">
                 <form onSubmit={handleSubmit}>
                     <IonGrid>
-                        
+
                         {/* 1. INFORMACIÓN BÁSICA (Sin negritas en h2, sin clase ion-text-bold en IonLabel) */}
                         <h2 className="ion-margin-top ion-margin-bottom">Información General</h2>
-                        
+
                         <IonRow>
                             <IonCol size="12">
-                                <IonItem lines="full" className="ion-margin-bottom"> 
+                                <IonItem lines="full" className="ion-margin-bottom">
                                     <IonLabel position="stacked">Nombre del Alojamiento</IonLabel>
-                                    <IonInput 
-                                        type="text" 
-                                        name="name" 
-                                        value={formData.name} 
-                                        onIonChange={handleChange} 
-                                        required 
+                                    <IonInput
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onIonChange={handleChange}
+                                        required
                                     />
                                 </IonItem>
                             </IonCol>
@@ -175,11 +214,11 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                             <IonCol size="12" size-md="6">
                                 <IonItem lines="full" className="ion-margin-bottom">
                                     <IonLabel position="stacked">Precio por Noche ($)</IonLabel>
-                                    <IonInput 
-                                        type="number" 
-                                        name="pricePerNight" 
-                                        value={formData.pricePerNight} 
-                                        onIonChange={handleChange} 
+                                    <IonInput
+                                        type="number"
+                                        name="pricePerNight"
+                                        value={formData.pricePerNight}
+                                        onIonChange={handleChange}
                                         min="0.01"
                                         step="0.01"
                                         required
@@ -189,27 +228,27 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                             <IonCol size="12" size-md="6">
                                 <IonItem lines="full" className="ion-margin-bottom">
                                     <IonLabel position="stacked">Máximo Huéspedes</IonLabel>
-                                    <IonInput 
-                                        type="number" 
-                                        name="numberOfGuests" 
-                                        value={formData.numberOfGuests} 
-                                        onIonChange={handleChange} 
-                                        min="1" 
+                                    <IonInput
+                                        type="number"
+                                        name="numberOfGuests"
+                                        value={formData.numberOfGuests}
+                                        onIonChange={handleChange}
+                                        min="1"
                                         required
                                     />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
-                        
+
                         {/* Fila 3: Tipo */}
                         <IonRow>
                             <IonCol size="12">
                                 <IonItem lines="full" className="ion-margin-bottom">
                                     <IonLabel>Tipo de Propiedad</IonLabel>
-                                    <IonSelect 
-                                        name="type" 
-                                        value={formData.type} 
-                                        onIonChange={handleChange} 
+                                    <IonSelect
+                                        name="type"
+                                        value={formData.type}
+                                        onIonChange={handleChange}
                                         placeholder="Selecciona uno"
                                         required
                                     >
@@ -234,10 +273,10 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                                     {/* NEGRITAS APLICADAS AQUÍ */}
                                     <strong>{selectedFiles.length}</strong> de <strong>{MAX_IMAGES}</strong> fotos seleccionadas
                                 </p>
-                                
+
                                 {/* Input de archivo oculto (se mantiene igual) */}
-                                <input 
-                                    type="file" 
+                                <input
+                                    type="file"
                                     ref={fileInputRef}
                                     onChange={handleFileSelect}
                                     accept="image/*"
@@ -247,9 +286,9 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                                 />
 
                                 {/* Botón visible que dispara el click del input oculto (se mantiene igual) */}
-                                <IonButton 
-                                    expand="block" 
-                                    fill="outline" 
+                                <IonButton
+                                    expand="block"
+                                    fill="outline"
                                     onClick={() => fileInputRef.current.click()}
                                     disabled={selectedFiles.length >= MAX_IMAGES}
                                     className="ion-margin-bottom"
@@ -259,7 +298,7 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                                 </IonButton>
                             </IonCol>
                         </IonRow>
-                        
+
                         {/* Previsualización de Imágenes (se mantiene igual) */}
                         {selectedFiles.length > 0 && (
                             <IonRow className="ion-margin-bottom">
@@ -271,10 +310,10 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                                                 alt={`Preview ${index + 1}`}
                                                 style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
                                             />
-                                            <IonButton 
-                                                size="small" 
-                                                color="danger" 
-                                                onClick={() => handleRemoveFile(index)} 
+                                            <IonButton
+                                                size="small"
+                                                color="danger"
+                                                onClick={() => handleRemoveFile(index)}
                                                 style={{ position: 'absolute', top: '5px', right: '5px' }}
                                             >
                                                 <IonIcon icon={closeCircle} />
@@ -293,31 +332,118 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                         <h2 className="ion-margin-top ion-margin-bottom">Detalles y Ubicación</h2>
 
                         <IonRow>
-                            <IonCol size="12">
+                            <IonCol size="12" size-md="6">
                                 <IonItem lines="full" className="ion-margin-bottom">
-                                    <IonLabel position="stacked">Dirección (Ubicación)</IonLabel>
-                                    <IonTextarea
-                                        name="location"
-                                        value={formData.location.address}
-                                        onIonChange={handleLocationChange}
-                                        rows={2}
+                                    <IonLabel position="stacked">Calle</IonLabel>
+                                    <IonInput
+                                        name="calle"
+                                        value={formData.location.calle}
+                                        onIonChange={handleNestedChange}
+                                        data-parent="location"
                                         required
                                     />
                                 </IonItem>
                             </IonCol>
+                            <IonCol size="12" size-md="6">
+                                <IonItem lines="full" className="ion-margin-bottom">
+                                    <IonLabel position="stacked">Número</IonLabel>
+                                    <IonInput
+                                        name="numero"
+                                        value={formData.location.numero}
+                                        onIonChange={handleNestedChange}
+                                        data-parent="location"
+                                    />
+                                </IonItem>
+                            </IonCol>
+                            <IonCol size="12" size-md="6">
+                                <IonItem lines="full" className="ion-margin-bottom">
+                                    <IonLabel position="stacked">Colonia</IonLabel>
+                                    <IonInput
+                                        name="colonia"
+                                        value={formData.location.colonia}
+                                        onIonChange={handleNestedChange}
+                                        data-parent="location"
+                                        required
+                                    />
+                                </IonItem>
+                            </IonCol>
+                            <IonCol size="12" size-md="6">
+                                <IonItem lines="full" className="ion-margin-bottom">
+                                    <IonLabel position="stacked">Código Postal</IonLabel>
+                                    <IonInput
+                                        name="codigoPostal"
+                                        type="number"
+                                        value={formData.location.codigoPostal}
+                                        onIonChange={handleNestedChange}
+                                        data-parent="location"
+                                    />
+                                </IonItem>
+                            </IonCol>
                         </IonRow>
-                        
+
                         {/* Fila 5: Descripción */}
+                        <h2 className="ion-margin-top ion-margin-bottom">Características</h2>
                         <IonRow>
                             <IonCol size="12">
                                 <IonItem lines="full" className="ion-margin-bottom">
-                                    <IonLabel position="stacked">Descripción Completa</IonLabel>
+                                    <IonLabel position="stacked">Descripción General</IonLabel>
                                     <IonTextarea
-                                        name="description"
-                                        value={formData.description.fullDescription}
-                                        onIonChange={handleDescriptionChange}
+                                        name="general"
+                                        value={formData.description.general}
+                                        onIonChange={handleNestedChange}
+                                        data-parent="description"
                                         rows={4}
                                         required
+                                    />
+                                </IonItem>
+                            </IonCol>
+                            <IonCol size="12" size-md="6">
+                                <IonItem lines="full" className="ion-margin-bottom">
+                                    <IonLabel>Servicio de Internet</IonLabel>
+                                    <IonToggle
+                                        name="internet"
+                                        checked={formData.description.internet}
+                                        onIonChange={handleNestedChange}
+                                        data-parent="description"
+                                        slot="end"
+                                    />
+                                </IonItem>
+                            </IonCol>
+                            <IonCol size="12" size-md="6">
+                                <IonItem lines="full" className="ion-margin-bottom">
+                                    <IonLabel>Cuarto de Lavado</IonLabel>
+                                    <IonToggle
+                                        name="lavado"
+                                        checked={formData.description.lavado}
+                                        onIonChange={handleNestedChange}
+                                        data-parent="description"
+                                        slot="end"
+                                    />
+                                </IonItem>
+                            </IonCol>
+                            <IonCol size="12" size-md="6">
+                                <IonItem lines="full" className="ion-margin-bottom">
+                                    <IonLabel position="stacked">Camas Individuales</IonLabel>
+                                    <IonInput
+                                        name="camasIndividuales"
+                                        type="number"
+                                        value={formData.description.camasIndividuales}
+                                        onIonChange={handleNestedChange}
+                                        data-parent="description"
+                                        min="0"
+                                    />
+                                </IonItem>
+                            </IonCol>
+                            <IonCol size="12" size-md="6">
+                                <IonItem lines="full" className="ion-margin-bottom">
+                                    <IonLabel position="stacked">Camas Matrimoniales</IonLabel>
+                                    <IonInput
+                                        name="camasMatrimoniales"
+                                        type="number"
+                                        value={formData.description.camasMatrimoniales}
+                                        onIonChange={handleNestedChange}
+                                        data-parent="description"
+                                        min="0"
                                     />
                                 </IonItem>
                             </IonCol>
@@ -330,9 +456,9 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                             <IonCol size="12" size-md="6">
                                 <IonItem lines="full" className="ion-margin-bottom">
                                     <IonLabel>Permitir Niños</IonLabel>
-                                    <IonToggle 
-                                        name="kidsAllowed" 
-                                        checked={formData.kidsAllowed} 
+                                    <IonToggle
+                                        name="kidsAllowed"
+                                        checked={formData.kidsAllowed}
                                         onIonChange={handleChange}
                                         slot="end"
                                     />
@@ -341,9 +467,9 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                             <IonCol size="12" size-md="6">
                                 <IonItem lines="full" className="ion-margin-bottom">
                                     <IonLabel>Permitir Mascotas</IonLabel>
-                                    <IonToggle 
-                                        name="petsAllowed" 
-                                        checked={formData.petsAllowed} 
+                                    <IonToggle
+                                        name="petsAllowed"
+                                        checked={formData.petsAllowed}
                                         onIonChange={handleChange}
                                         slot="end"
                                     />
@@ -356,29 +482,29 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                             <IonCol size="12">
                                 <IonItem lines="full" className="ion-margin-bottom">
                                     <IonLabel>Visible para el Público (Publicar)</IonLabel>
-                                    <IonToggle 
-                                        name="showProperty" 
-                                        checked={formData.showProperty} 
+                                    <IonToggle
+                                        name="showProperty"
+                                        checked={formData.showProperty}
                                         onIonChange={handleChange}
                                         slot="end"
                                     />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
-                        
+
                     </IonGrid>
-                    
+
                     {/* Botón de Guardar */}
-                    <IonButton 
-                        expand="block" 
-                        type="submit" 
+                    <IonButton
+                        expand="block"
+                        type="submit"
                         className="ion-margin-top ion-padding-vertical"
                     >
                         {propertyData ? 'Guardar Cambios' : 'Registrar Propiedad'}
                     </IonButton>
                 </form>
             </IonContent>
-            
+
             {/* Alerta de Límite de Fotos */}
             <IonAlert
                 isOpen={showAlert}

@@ -11,9 +11,9 @@ const propertyService = {
         });
         return response;
     },
-    "save": async () => {
+    "save": async (data) => {
         try{
-            const response = await apiClient.post('/properties');
+            const response = await apiClient.post('/properties/register', data);
             return response;
         }catch (error){
             throw error;

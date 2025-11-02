@@ -90,7 +90,6 @@ const Login = () => {
                 history.push('/');
             } catch (error) {
                 setIsLoading(false);
-                console.log("Este es el error del login", error);
                 if (error.response) {
                     if (error.response.status === 401) {
                         console.log(error);
