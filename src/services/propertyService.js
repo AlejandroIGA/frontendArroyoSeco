@@ -10,6 +10,15 @@ const propertyService = {
             params: searchParams
         });
         return response;
+    },
+    "save": async () => {
+        try{
+            const response = await apiClient.post('/properties');
+            return response;
+        }catch (error){
+            throw error;
+        }
+        
     }
 
 }
