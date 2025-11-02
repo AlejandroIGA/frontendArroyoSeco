@@ -82,10 +82,12 @@ const Property = () => {
                 {mainView === 'propiedades' && (
                     <div className="placeholder-message">
                         <IonButton onClick={() => setOpenModal(true)}> Agregar propiedad</IonButton>
-                        {
+                        { properties.length !== 0 ?
                             properties.map(data => (
                                 <PropertyCardData key={data.id} property={data} />
                             ))
+                            :
+                            <p>No hay propiedades registradas</p>
                         }
                     </div>
                 )}
