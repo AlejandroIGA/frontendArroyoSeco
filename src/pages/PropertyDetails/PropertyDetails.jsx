@@ -13,19 +13,16 @@ import {
     IonButton,
     IonText,
     IonCard,
-    IonCardContent,
-    IonSpinner,
-    IonInput,
-    IonModal,
-    IonDatetime,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonBackButton
+    IonCardContent
 } from '@ionic/react';
 
-import { cashOutline, peopleOutline, mapOutline, pawOutline, accessibilityOutline, checkmarkCircleOutline, closeCircleOutline, homeOutline, bedOutline } from 'ionicons/icons';
+import { peopleOutline, pawOutline, accessibilityOutline, checkmarkCircleOutline, closeCircleOutline, homeOutline } from 'ionicons/icons';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import '@ionic/react/css/ionic-swiper.css';
 
 import AppShell from "../../components/AppShell/AppShell";
 import ReservationForm from "../../components/ReservationForm/ReservationForm";
@@ -37,7 +34,6 @@ const PropertyDetails = () => {
 
     const [property, setProperty] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [detailKeys, setDetailKeys] = useState(null);
 
     const keyTranslations = {
@@ -85,9 +81,32 @@ const PropertyDetails = () => {
 
                             <IonRow className="ion-margin-bottom">
                                 <IonCol size="12">
-                                    <div className="main-image-container">
-                                        {/*AQUI VA UNA IMAGEN, FALTA DEFINIR EL CARRUSEL, PERO TAMBIÉN FALTA MANEJAR LA CARGA DE IMAGENES*/}
-                                    </div>
+                                    {property.imagen && property.imagen.length > 0 ? (
+
+                                        <Swiper
+                                            modules={[Autoplay, Pagination]} // Añade los módulos
+                                            pagination={true} // Muestra los "puntitos"
+                                            loop={true}
+                                            autoplay={{ delay: 3000 }}
+                                        >
+                                            {property.imagen.map((imageUrl, index) => (
+                                                <SwiperSlide key={index}>
+                                                    <div className="main-image-container">
+                                                        <IonImg
+                                                            src={imageUrl}
+                                                            alt={`${property.name} - Imagen ${index + 1}`}
+                                                            className="main-property-image"
+                                                        />
+                                                    </div>
+                                                </SwiperSlide>
+                                            ))}
+                                        </Swiper>
+
+                                    ) : (
+                                        <div className="main-image-container placeholder-image">
+                                            <IonText color="medium">No hay imágenes disponibles</IonText>
+                                        </div>
+                                    )}
                                 </IonCol>
                             </IonRow>
 
@@ -171,13 +190,25 @@ const PropertyDetails = () => {
                                         </IonCardContent>
                                     </IonCard>
                                 </IonCol>
+                                {
+                                    localStorage.getItem("userRole") == "propietario" ?
+                                        <IonCol>
+                                            <IonButton expand="block">
+                                                Editar
+                                            </IonButton>
+                                            <IonButton expand="block" color="warning">
+                                                Eliminar
+                                            </IonButton>
+                                        </IonCol>
+                                        :
+                                        <IonCol size="12" size-md="4">
+                                            <ReservationForm
+                                                propertyId={property.id}
+                                                pricePerNight={parseFloat(property.pricePerNight)}
+                                            />
+                                        </IonCol>
+                                }
 
-                                <IonCol size="12" size-md="4">
-                                    <ReservationForm
-                                        propertyId={property.id}
-                                        pricePerNight={parseFloat(property.pricePerNight)}
-                                    />
-                                </IonCol>
                             </IonRow>
 
                         </IonGrid>

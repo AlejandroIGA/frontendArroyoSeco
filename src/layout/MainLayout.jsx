@@ -35,7 +35,7 @@ const MainLayout = ({ children, activePage }) => {
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <IonContent fullscreen={true} scrollY={false}>
+        <IonContent fullscreen={true}>
           <IonGrid className="ion-h-100">
             <IonRow className="ion-h-100">
               <IonCol size="4" size-md="3" className="ion-hide-md-down sidebar-col">
