@@ -19,6 +19,7 @@ import {
     IonCol,
     IonIcon,
     IonAlert,
+    IonSpinner,
 } from '@ionic/react';
 import { cameraOutline, closeCircle } from 'ionicons/icons';
 
@@ -55,8 +56,32 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const fileInputRef = useRef(null);
     const [showAlert, setShowAlert] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
-    // ... (Lógica de useEffect, handleChange, handleFileSelect, etc. - SE MANTIENE IGUAL)
+    const uploadImage = async (file) => {
+        // Configura con tus datos de Cloudinary
+        const CLOUD_NAME = "drnbqdbp4";
+        const UPLOAD_PRESET = "arroyoSeco";
+        const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
+        const data = new FormData();
+        data.append('file', file);
+        data.append('upload_preset', UPLOAD_PRESET);
+
+        try {
+            const response = await fetch(UPLOAD_URL, {
+                method: 'POST',
+                body: data,
+            });
+            const responseData = await response.json();
+
+            return responseData.secure_url;
+        } catch (error) {
+            console.error("Error al subir la imagen:", error);
+            throw error;
+        }
+    };
+
     useEffect(() => {
         if (propertyData) {
             setFormData({
@@ -146,13 +171,30 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
         setSelectedFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (selectedFiles.length === 0 && !propertyData) {
             alert(`Debes subir al menos 1 fotografía para la propiedad. Máximo ${MAX_IMAGES} fotos.`);
             return;
         }
+
+        //Carga de imagenes a Cloudinary
+        setIsUploading(true);
+        let uploadedImageUrls = [];
+        try {
+            const uploadPromises = selectedFiles.map(file => uploadImage(file));
+
+            uploadedImageUrls = await Promise.all(uploadPromises);
+            console.log("URLs de imágenes subidas:", uploadedImageUrls);
+
+        } catch (error) {
+            console.error("Una o más imágenes fallaron al subirse:", error);
+            alert("Error al subir las imágenes. Inténtalo de nuevo.");
+            setIsUploading(false);
+            return;
+        }
+        setIsUploading(false);
 
         const stringifyMapValues = (mapObject) => {
             const newMap = {};
@@ -166,9 +208,11 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
             ...formData,
             location: stringifyMapValues(formData.location),
             description: stringifyMapValues(formData.description),
-            newImages: selectedFiles,
+            imagen: uploadedImageUrls,
             ownerId: localStorage.getItem('userId')
         };
+
+        console.log(dataToSave);
 
         onSave(dataToSave);
     };
@@ -499,8 +543,13 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                         expand="block"
                         type="submit"
                         className="ion-margin-top ion-padding-vertical"
+                        disabled={isUploading} 
                     >
-                        {propertyData ? 'Guardar Cambios' : 'Registrar Propiedad'}
+                        {
+                            isUploading ?
+                                <IonSpinner name="crescent" /> : 
+                                (propertyData ? 'Guardar Cambios' : 'Registrar Propiedad') 
+                        }
                     </IonButton>
                 </form>
             </IonContent>

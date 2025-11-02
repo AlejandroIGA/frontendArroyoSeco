@@ -79,7 +79,6 @@ const Property = () => {
                 {mainView === 'reservas' && (
                     <RequestsCardData />
                 )}
-                {/*'propiedades' */}
                 {mainView === 'propiedades' && (
                     <div className="placeholder-message">
                         <IonButton onClick={() => setOpenModal(true)}> Agregar propiedad</IonButton>
