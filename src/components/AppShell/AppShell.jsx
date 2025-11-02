@@ -77,6 +77,7 @@ const AppShell = ({ children, onSearchResults }) => {
         localStorage.removeItem("isSessionActive");
         localStorage.removeItem("userId");
         localStorage.removeItem("userRole");
+        localStorage.removeItem("hasAcceptedTerms");
         window.location.reload();
     }
 

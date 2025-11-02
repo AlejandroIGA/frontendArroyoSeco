@@ -17,7 +17,7 @@ import { cashOutline, peopleOutline, homeOutline } from 'ionicons/icons';
 import './PropertyCardData.css';
 
 const PropertyCardData = ({ property }) => {
-    const { id, name, pricePerNight, numberOfGuests, imageUrl } = property;
+    const { id, name, pricePerNight, numberOfGuests} = property;
 
     return (
         <IonCard className="property-card-horizontal">
@@ -26,7 +26,7 @@ const PropertyCardData = ({ property }) => {
                     
                     <IonCol size="12" size-md="4">
                         <IonImg 
-                            src={imageUrl}
+                            src={property.imagen[0]}
                             alt={name} 
                             className="property-image" 
                         />
