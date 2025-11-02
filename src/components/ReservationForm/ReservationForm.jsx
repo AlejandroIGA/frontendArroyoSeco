@@ -20,6 +20,12 @@ const getTodayAndTomorrow = () => {
 
 const { today, tomorrow } = getTodayAndTomorrow();
 
+const formatForDisplay = (isoDate) => {
+  if (!isoDate) return '';
+  const [year, month, day] = isoDate.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 const ReservationForm = ({ propertyId, pricePerNight }) => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +76,7 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
     }
     const bookingData = {
       propertyId: propertyId,
-      userId: userId,     
+      userId: userId,
       startDate: bookingDetails.startDate,
       endDate: bookingDetails.endDate,
       status: "Pendiente"
@@ -98,12 +104,12 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
           <IonList lines="full" className="ion-no-padding ion-margin-bottom">
             <IonItem button detail={false} className="date-input-group" onClick={() => setShowStartDateModal(true)}>
               <IonLabel position="stacked">Llegada</IonLabel>
-              <IonText slot="end" className="widget-date-text">{bookingDetails.startDate}</IonText>
+              <IonText slot="end" className="widget-date-text">{formatForDisplay(bookingDetails.startDate)}</IonText>
             </IonItem>
 
             <IonItem button detail={false} className="date-input-group ion-margin-top" onClick={() => setShowEndDateModal(true)}>
               <IonLabel position="stacked">Salida</IonLabel>
-              <IonText slot="end" className="widget-date-text">{bookingDetails.endDate}</IonText>
+              <IonText slot="end" className="widget-date-text">{formatForDisplay(bookingDetails.endDate)}</IonText>
             </IonItem>
           </IonList>
 
