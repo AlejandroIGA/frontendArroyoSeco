@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     IonSegment,
     IonSegmentButton,
@@ -54,6 +54,15 @@ const Property = () => {
        }
     }
 
+    const getMyProperties = async() => {
+        const response = await propertyService.getMyProperties();
+        console.log(response);
+    } 
+
+    useEffect(()=>{
+        getMyProperties();
+    },[])
+
     return (
         <MainLayout pageTitle="Mis Propiedades" activePage="propiedades">
             <div className="ion-padding">
@@ -85,7 +94,7 @@ const Property = () => {
             <IonLoading
                             isOpen={isLoading}
                             onDidDismiss={() => setIsLoading(false)}
-                            message={'Registrando su información...'}
+                            message={'Registrando la propiedad...'}
                             duration={0}
                         />
         </MainLayout>

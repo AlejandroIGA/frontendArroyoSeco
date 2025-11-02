@@ -104,15 +104,6 @@ const PropertyDetails = () => {
     
     return (
         <IonPage>
-            <IonHeader>
-                <IonToolbar color="primary">
-                    <IonButtons slot="start">
-                        <IonBackButton defaultHref="/properties" />
-                    </IonButtons>
-                    <IonTitle>{property.name}</IonTitle>
-                </IonToolbar>
-            </IonHeader>
-
             <AppShell> 
                 <IonGrid fixed={true} className="content-grid ion-padding">
                     
