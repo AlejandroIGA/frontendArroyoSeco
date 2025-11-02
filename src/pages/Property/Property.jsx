@@ -12,11 +12,13 @@ import MainLayout from "../../layout/MainLayout";
 import "./Property.css";
 import PropertyFormModal from "./PropertyFormModal";
 import propertyService from "../../services/propertyService";
+import PropertyCardData from "../../components/PropertyCardData/PropertyCardData";
 const Property = () => {
     const [mainView, setMainView] = useState('reservas');
     const [openModal, setOpenModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [presentToast] = useIonToast();
+    const [properties, setProperties] = useState([]);
 
     const save = async (data) => {
         setIsLoading(true);
@@ -56,7 +58,7 @@ const Property = () => {
 
     const getMyProperties = async() => {
         const response = await propertyService.getMyProperties();
-        console.log(response);
+        setProperties(response.data);
     } 
 
     useEffect(()=>{
@@ -81,8 +83,11 @@ const Property = () => {
                 {mainView === 'propiedades' && (
                     <div className="placeholder-message">
                         <IonButton onClick={() => setOpenModal(true)}> Agregar propiedad</IonButton>
-                        <h2>Mis Propiedades</h2>
-                        <p>Aquí se mostrará la lista de tus propiedades para que puedas gestionarlas.</p>
+                        {
+                             properties.map(data => (
+                                    <PropertyCardData key={data.id} property={data} />
+                                ))
+                        }
                     </div>
                 )}
             </div>

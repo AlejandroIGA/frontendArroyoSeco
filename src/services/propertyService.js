@@ -27,6 +27,14 @@ const propertyService = {
         }catch (error){
             throw error;
         }
+    },
+    "getById": async(id) => {
+        try{
+            const response = await apiClient.get(`/properties/${id}`);
+            return response;
+        }catch(error){
+            throw error;
+        }
     }
 
 }
