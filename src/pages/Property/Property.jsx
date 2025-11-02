@@ -22,48 +22,48 @@ const Property = () => {
 
     const save = async (data) => {
         setIsLoading(true);
-        try{
+        try {
             await propertyService.save(data);
             setIsLoading(false);
             presentToast({
-                    message: 'Se registro la información de la propiedad.',
-                    duration: 3000,
-                    color: 'success',
-                    position: 'top'
-                });
+                message: 'Se registro la información de la propiedad.',
+                duration: 3000,
+                color: 'success',
+                position: 'top'
+            });
             setOpenModal(false);
         }
-       catch(error){
-        setIsLoading(false);
-        if (error.response) {
-                    if (error.response.status === 401) {
-                        console.log(error);
-                       errorMsg = "Credenciales incorrectas.";
-                    } else {
-                        errorMsg = "Error inesperado.";
-                    }
-                } else if (error.code === "ERR_NETWORK") {
-                    errorMsg = 'Error de conexión.';
+        catch (error) {
+            setIsLoading(false);
+            if (error.response) {
+                if (error.response.status === 401) {
+                    console.log(error);
+                    errorMsg = "Credenciales incorrectas.";
                 } else {
-                    errorMsg = 'Ocurrió un error en la aplicación.';
+                    errorMsg = "Error inesperado.";
                 }
-                presentToast({
+            } else if (error.code === "ERR_NETWORK") {
+                errorMsg = 'Error de conexión.';
+            } else {
+                errorMsg = 'Ocurrió un error en la aplicación.';
+            }
+            presentToast({
                 message: errorMsg,
                 duration: 3000,
                 color: 'danger',
                 position: 'top'
             });
-       }
+        }
     }
 
-    const getMyProperties = async() => {
+    const getMyProperties = async () => {
         const response = await propertyService.getMyProperties();
         setProperties(response.data);
-    } 
+    }
 
-    useEffect(()=>{
+    useEffect(() => {
         getMyProperties();
-    },[])
+    }, [])
 
     return (
         <MainLayout pageTitle="Mis Propiedades" activePage="propiedades">
@@ -83,9 +83,9 @@ const Property = () => {
                     <div className="placeholder-message">
                         <IonButton onClick={() => setOpenModal(true)}> Agregar propiedad</IonButton>
                         {
-                             properties.map(data => (
-                                    <PropertyCardData key={data.id} property={data} />
-                                ))
+                            properties.map(data => (
+                                <PropertyCardData key={data.id} property={data} />
+                            ))
                         }
                     </div>
                 )}
@@ -96,11 +96,11 @@ const Property = () => {
                 onSave={save}
             />
             <IonLoading
-                            isOpen={isLoading}
-                            onDidDismiss={() => setIsLoading(false)}
-                            message={'Registrando la propiedad...'}
-                            duration={0}
-                        />
+                isOpen={isLoading}
+                onDidDismiss={() => setIsLoading(false)}
+                message={'Registrando la propiedad...'}
+                duration={0}
+            />
         </MainLayout>
     );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import {
     IonPage,
     IonGrid,
@@ -13,7 +13,9 @@ import {
     IonButton,
     IonText,
     IonCard,
-    IonCardContent
+    IonCardContent,
+    useIonToast,
+    IonLoading
 } from '@ionic/react';
 
 import { peopleOutline, pawOutline, accessibilityOutline, checkmarkCircleOutline, closeCircleOutline, homeOutline } from 'ionicons/icons';
@@ -28,6 +30,7 @@ import AppShell from "../../components/AppShell/AppShell";
 import ReservationForm from "../../components/ReservationForm/ReservationForm";
 import './PropertyDetails.css';
 import propertyService from "../../services/propertyService";
+import PropertyFormModal from "../Property/PropertyFormModal";
 
 const PropertyDetails = () => {
     const { id } = useParams();
@@ -35,6 +38,12 @@ const PropertyDetails = () => {
     const [property, setProperty] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [detailKeys, setDetailKeys] = useState(null);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [presentToast] = useIonToast();
+
+    const history = useHistory()
 
     const keyTranslations = {
         internet: "Servicio de Internet",
@@ -48,16 +57,74 @@ const PropertyDetails = () => {
     }
 
     const findPropertyById = async (id) => {
-        const response = await propertyService.getById(id);
-        console.log(response);
-        setProperty(response.data);
-        defineDetailKeys(response.data);
-        setIsLoading(false);
+        try {
+            const response = await propertyService.getById(id);
+            console.log(response);
+            setProperty(response.data);
+            defineDetailKeys(response.data);
+        } catch (error) {
+            console.error("Error al cargar la propiedad:", error);
+            presentToast({
+                message: 'No se pudo cargar la propiedad.',
+                duration: 3000,
+                color: 'danger',
+                position: 'top'
+            });
+            history.push('/user-dashboard/property');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
         findPropertyById(id);
     }, [id]);
+
+    const handleEditSave = async (dataToSave) => {
+        setIsSaving(true);
+        try {
+            await propertyService.update(id, dataToSave);
+            
+            setIsModalOpen(false);
+            
+            await findPropertyById(id); 
+
+            presentToast({
+                message: 'Propiedad actualizada con éxito.',
+                duration: 3000,
+                color: 'success',
+                position: 'top'
+            });
+
+        } catch (error) {
+            presentToast({
+                message: 'Error al actualizar la propiedad.',
+                duration: 3000,
+                color: 'danger',
+                position: 'top'
+            });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const deleteProperty = async (id) => {
+        setIsLoading(true);
+        try{
+            await propertyService.delete(id);
+            setIsModalOpen(false);
+            history.push('/user-dashboard/property');
+        }catch(error){
+            presentToast({
+                message: 'Error al actualizar la propiedad.',
+                duration: 3000,
+                color: 'danger',
+                position: 'top'
+            });
+        }finally {
+            setIsSaving(false);
+        }
+    }  
 
     return (
         <IonPage>
@@ -84,8 +151,8 @@ const PropertyDetails = () => {
                                     {property.imagen && property.imagen.length > 0 ? (
 
                                         <Swiper
-                                            modules={[Autoplay, Pagination]} // Añade los módulos
-                                            pagination={true} // Muestra los "puntitos"
+                                            modules={[Autoplay, Pagination]}
+                                            pagination={true}
                                             loop={true}
                                             autoplay={{ delay: 3000 }}
                                         >
@@ -193,10 +260,10 @@ const PropertyDetails = () => {
                                 {
                                     localStorage.getItem("userRole") == "propietario" ?
                                         <IonCol>
-                                            <IonButton expand="block">
+                                            <IonButton expand="block" onClick={() => setIsModalOpen(true)}>
                                                 Editar
                                             </IonButton>
-                                            <IonButton expand="block" color="warning">
+                                            <IonButton expand="block" color="warning" onClick={() => deleteProperty(id)}>
                                                 Eliminar
                                             </IonButton>
                                         </IonCol>
@@ -213,7 +280,19 @@ const PropertyDetails = () => {
 
                         </IonGrid>
                 }
+                {property && (
+                <PropertyFormModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSave={handleEditSave}
+                    propertyData={property}
+                />
+            )}
             </AppShell>
+            <IonLoading
+                isOpen={isSaving}
+                message={'Guardando cambios...'}
+            />
         </IonPage>
     );
 };

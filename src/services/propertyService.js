@@ -35,6 +35,22 @@ const propertyService = {
         }catch(error){
             throw error;
         }
+    },
+    "update": async(id,data) => {
+        try{
+            const response = await apiClient.put(`/properties/update/${id}`,data);
+            return response;
+        }catch(error){
+            throw error;
+        }
+    },
+    "delete": async(id) => {
+        try{
+            const response = await apiClient.delete(`/properties/delete/${id}`);
+            return response;
+        }catch(error){
+            throw error;
+        }
     }
 
 }

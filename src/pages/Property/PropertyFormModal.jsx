@@ -58,8 +58,20 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
     const [showAlert, setShowAlert] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
+    const parseMapValues = (mapObject) => {
+        if (!mapObject) return {};
+        const newMap = {};
+        for (const key in mapObject) {
+            try {
+                newMap[key] = JSON.parse(mapObject[key]);
+            } catch (e) {
+                newMap[key] = mapObject[key];
+            }
+        }
+        return newMap;
+    };
+
     const uploadImage = async (file) => {
-        // Configura con tus datos de Cloudinary
         const CLOUD_NAME = "drnbqdbp4";
         const UPLOAD_PRESET = "arroyoSeco";
         const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
@@ -84,6 +96,8 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
 
     useEffect(() => {
         if (propertyData) {
+            const parsedLocation = parseMapValues(propertyData.location);
+            const parsedDescription = parseMapValues(propertyData.description);
             setFormData({
                 id: propertyData.id,
                 name: propertyData.name || '',
@@ -93,8 +107,8 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                 kidsAllowed: propertyData.kidsAllowed || false,
                 petsAllowed: propertyData.petsAllowed || false,
                 showProperty: propertyData.showProperty || false,
-                location: propertyData.location || { address: '' },
-                description: propertyData.description || { fullDescription: '' },
+                location: parsedLocation,
+                description: parsedDescription,
                 imagen: propertyData.imagen || [],
             });
             setSelectedFiles([]);
@@ -151,17 +165,21 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
 
     const handleFileSelect = (e) => {
         const files = Array.from(e.target.files);
-        const totalFiles = [...selectedFiles, ...files];
 
-        if (totalFiles.length > MAX_IMAGES) {
-            const filesToAdd = MAX_IMAGES - selectedFiles.length;
-            setSelectedFiles(prevFiles => [
-                ...prevFiles,
-                ...files.slice(0, filesToAdd)
-            ]);
+        const currentTotalImages = formData.imagen.length + selectedFiles.length;
+        const newTotal = currentTotalImages + files.length;
+
+        if (newTotal > MAX_IMAGES) {
+            const filesToAdd = MAX_IMAGES - currentTotalImages;
+            if (filesToAdd > 0) {
+                setSelectedFiles(prevFiles => [
+                    ...prevFiles,
+                    ...files.slice(0, filesToAdd)
+                ]);
+            }
             setShowAlert(true);
         } else {
-            setSelectedFiles(totalFiles);
+            setSelectedFiles(prevFiles => [...prevFiles, ...files]);
         }
 
         e.target.value = null;
@@ -169,6 +187,13 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
 
     const handleRemoveFile = (indexToRemove) => {
         setSelectedFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove));
+    };
+
+    const handleRemoveExistingFile = (indexToRemove) => {
+        setFormData(prev => ({
+            ...prev,
+            imagen: prev.imagen.filter((_, index) => index !== indexToRemove)
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -184,12 +209,8 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
         let uploadedImageUrls = [];
         try {
             const uploadPromises = selectedFiles.map(file => uploadImage(file));
-
             uploadedImageUrls = await Promise.all(uploadPromises);
-            console.log("URLs de imágenes subidas:", uploadedImageUrls);
-
         } catch (error) {
-            console.error("Una o más imágenes fallaron al subirse:", error);
             alert("Error al subir las imágenes. Inténtalo de nuevo.");
             setIsUploading(false);
             return;
@@ -204,15 +225,15 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
             return newMap;
         };
 
+        const finalImageUrls = [...formData.imagen, ...uploadedImageUrls];
+
         const dataToSave = {
             ...formData,
             location: stringifyMapValues(formData.location),
             description: stringifyMapValues(formData.description),
-            imagen: uploadedImageUrls,
+            imagen: finalImageUrls,
             ownerId: localStorage.getItem('userId')
         };
-
-        console.log(dataToSave);
 
         onSave(dataToSave);
     };
@@ -315,7 +336,7 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                                 </p>
                                 <p className="ion-text-end ion-margin-top">
                                     {/* NEGRITAS APLICADAS AQUÍ */}
-                                    <strong>{selectedFiles.length}</strong> de <strong>{MAX_IMAGES}</strong> fotos seleccionadas
+                                    <strong>{formData.imagen.length + selectedFiles.length}</strong> de <strong>{MAX_IMAGES}</strong> fotos seleccionadas
                                 </p>
 
                                 {/* Input de archivo oculto (se mantiene igual) */}
@@ -326,7 +347,7 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                                     accept="image/*"
                                     multiple
                                     style={{ display: 'none' }}
-                                    disabled={selectedFiles.length >= MAX_IMAGES}
+                                    disabled={formData.imagen.length + selectedFiles.length >= MAX_IMAGES}
                                 />
 
                                 {/* Botón visible que dispara el click del input oculto (se mantiene igual) */}
@@ -334,7 +355,7 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                                     expand="block"
                                     fill="outline"
                                     onClick={() => fileInputRef.current.click()}
-                                    disabled={selectedFiles.length >= MAX_IMAGES}
+                                    disabled={formData.imagen.length + selectedFiles.length >= MAX_IMAGES}
                                     className="ion-margin-bottom"
                                 >
                                     <IonIcon slot="start" icon={cameraOutline} />
@@ -342,12 +363,32 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                                 </IonButton>
                             </IonCol>
                         </IonRow>
-
-                        {/* Previsualización de Imágenes (se mantiene igual) */}
-                        {selectedFiles.length > 0 && (
+                        {/* Previsualización de Imágenes*/}
+                        {(formData.imagen.length > 0 || selectedFiles.length > 0) && (
                             <IonRow className="ion-margin-bottom">
+                                {/* 1. Renderiza las imágenes EXISTENTES (de formData.imagen) */}
+                                {formData.imagen.map((imageUrl, index) => (
+                                    <IonCol size="6" size-md="4" key={`existing-${index}`} className="ion-padding-bottom">
+                                        <div style={{ position: 'relative', width: '100%', paddingBottom: '100%', overflow: 'hidden' }}>
+                                            <img
+                                                src={imageUrl}
+                                                alt={`Existente ${index + 1}`}
+                                                style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                                            />
+                                            <IonButton
+                                                size="small"
+                                                color="danger"
+                                                onClick={() => handleRemoveExistingFile(index)}
+                                                style={{ position: 'absolute', top: '5px', right: '5px' }}
+                                            >
+                                                <IonIcon icon={closeCircle} />
+                                            </IonButton>
+                                        </div>
+                                    </IonCol>
+                                ))}
+                                {/* 2. Renderiza las imágenes NUEVAS (de selectedFiles) */}
                                 {selectedFiles.map((file, index) => (
-                                    <IonCol size="6" size-md="4" key={index} className="ion-padding-bottom">
+                                    <IonCol size="6" size-md="4" key={`new-${index}`} className="ion-padding-bottom">
                                         <div style={{ position: 'relative', width: '100%', paddingBottom: '100%', overflow: 'hidden' }}>
                                             <img
                                                 src={URL.createObjectURL(file)}
@@ -543,12 +584,12 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                         expand="block"
                         type="submit"
                         className="ion-margin-top ion-padding-vertical"
-                        disabled={isUploading} 
+                        disabled={isUploading}
                     >
                         {
                             isUploading ?
-                                <IonSpinner name="crescent" /> : 
-                                (propertyData ? 'Guardar Cambios' : 'Registrar Propiedad') 
+                                <IonSpinner name="crescent" /> :
+                                (propertyData ? 'Guardar Cambios' : 'Registrar Propiedad')
                         }
                     </IonButton>
                 </form>
