@@ -86,10 +86,14 @@ const Home = () => {
                 name: p.name,
                 pricePerNight: p.pricePerNight ? p.pricePerNight.toFixed(2) : "N/A",
                 numberOfGuests: p.numberOfGuests,
-                imageUrl: p.imagen && p.imagen.length > 0 ? p.imagen[0] : "placeholder.jpg",
+                imagen: p.imagen && p.imagen.length > 0 
+                ? [ p.imagen[0] ]
+                : [ "placeholder.jpg" ]
             }));
             setProperties(normalizedData);
+            console.log("Datos de la busqueda:", normalizedData);
         }
+
     };
 
     return (
