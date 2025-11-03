@@ -33,3 +33,7 @@ ion-modal.date-modal::part(content) {
   align-items: center;
   justify-content: center;
 }
+
+ion-header {
+  padding-top: env(safe-area-inset-top);
+}

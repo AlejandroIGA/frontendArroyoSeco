@@ -65,6 +65,8 @@ const Home = () => {
         if (localStorage.getItem('userRole') === "propietario"){
             history.push("/user-dashboard/profile")
         }
+
+        getProperties();
     });
 
     const handleAcceptTerms = () => {
@@ -90,9 +92,6 @@ const Home = () => {
         }
     };
 
-    useIonViewWillEnter(() => {
-        getProperties();
-    })
     return (
         <IonPage>
             <AppShell onSearchResults={handleSearchResults}>

@@ -1,6 +1,7 @@
 import { IonButton, IonCol, IonContent, IonFooter, IonGrid, IonHeader, 
     IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRouterLink, 
-    IonRow, useIonViewWillLeave, IonModal, IonDatetime } from "@ionic/react";
+    IonRow, useIonViewWillLeave, IonModal, IonDatetime, 
+    IonToolbar} from "@ionic/react";
 import { personOutline, logInOutline, person, searchOutline, personCircleOutline, personAddOutline } from 'ionicons/icons';
 
 import './AppShell.css'
@@ -84,6 +85,7 @@ const AppShell = ({ children, onSearchResults }) => {
     return (
         <>
             <IonHeader>
+                <IonToolbar>
                 <IonGrid >
                     <IonRow className="ion-align-items-center">
                         <IonCol size="2" class="ion-justify-content-end">
@@ -130,6 +132,7 @@ const AppShell = ({ children, onSearchResults }) => {
                         </IonCol>
                     </IonRow>
                 </IonGrid>
+                </IonToolbar>
             </IonHeader>
             <IonContent>
                 {children}

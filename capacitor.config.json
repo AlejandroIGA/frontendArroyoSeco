@@ -1,0 +1,20 @@
+{
+  "appId": "com.reservaciones.app",
+  "appName": "reservaciones",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#ffffff",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "light",
+      "backgroundColor": "#ffffff",
+      "overlaysWebView": false
+    }
+  }
+}

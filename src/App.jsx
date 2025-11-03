@@ -40,7 +40,6 @@ setupIonicReact();
 
 
 function App() {
-  
 
   return (
     <IonApp>
