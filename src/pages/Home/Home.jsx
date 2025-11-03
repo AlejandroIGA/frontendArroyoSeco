@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { useHistory } from 'react-router-dom';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonLoading, IonModal, IonPage, IonRow, IonTitle, IonToolbar, useIonToast, useIonViewWillEnter, IonImg } from "@ionic/react"
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonLoading, 
+IonModal, IonPage, IonRow, IonTitle, IonToolbar, useIonToast, useIonViewWillEnter, IonImg } from "@ionic/react"
 import AppShell from "../../components/AppShell/AppShell"
 import PropertyCardData from "../../components/PropertyCardData/PropertyCardData"
 import propertyService from "../../services/propertyService";
@@ -60,6 +61,10 @@ const Home = () => {
         if (!hasAccepted) {
             setShowTermsModal(true);
         }
+
+        if (localStorage.getItem('userRole') === "propietario"){
+            history.push("/user-dashboard/profile")
+        }
     });
 
     const handleAcceptTerms = () => {
@@ -85,9 +90,9 @@ const Home = () => {
         }
     };
 
-    useEffect(() => {
+    useIonViewWillEnter(() => {
         getProperties();
-    }, [])
+    })
     return (
         <IonPage>
             <AppShell onSearchResults={handleSearchResults}>

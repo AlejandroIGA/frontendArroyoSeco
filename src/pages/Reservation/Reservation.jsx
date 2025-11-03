@@ -12,6 +12,7 @@ import {
   IonButton,
   IonLoading,
   IonSpinner,
+  useIonViewWillEnter,
 } from "@ionic/react";
 import "./Reservation.css";
 import MainLayout from "../../layout/MainLayout";
@@ -33,8 +34,7 @@ const Reservaciones = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadData = async () => {
+  const loadData = async () => {
       try {
         setIsLoading(true);
         setError(null);
@@ -62,8 +62,11 @@ const Reservaciones = () => {
         setIsLoading(false);
       }
     };
+
+  useIonViewWillEnter(() => { 
     loadData();
-  }, []);
+  });
+
   useEffect(() => {
     const filtered = allReservations.filter(
       (res) => res.status.toLowerCase() === selectedStatus

@@ -4,7 +4,8 @@ import {
     IonBackButton, IonList, IonItem, IonInput, IonButton,
     IonIcon, IonGrid, IonRow, IonCol, IonSpinner,
     useIonToast,
-    IonLoading
+    IonLoading,
+    useIonViewWillEnter
 } from '@ionic/react';
 import { personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
 import './UserProfile.css';
@@ -56,9 +57,9 @@ const UserProfile = () => {
         }
     };
 
-    useEffect(() => {
+    useIonViewWillEnter(() => {
         fetchUserData();
-    }, []);
+    });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;

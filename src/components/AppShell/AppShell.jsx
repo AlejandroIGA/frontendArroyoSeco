@@ -87,7 +87,7 @@ const AppShell = ({ children, onSearchResults }) => {
                 <IonGrid >
                     <IonRow className="ion-align-items-center">
                         <IonCol size="2" class="ion-justify-content-end">
-                            <IonRouterLink routerLink="/">
+                            <IonRouterLink routerLink={localStorage.getItem("userRole") !== "visitante" ? "/user-dashboard/property"  : "/" }>
                                 <IonImg
                                     src="/logo.png"
                                     alt="Arroyo Seco"
@@ -96,13 +96,18 @@ const AppShell = ({ children, onSearchResults }) => {
                             </IonRouterLink>
                         </IonCol>
                         <IonCol className="ion-hide-lg-down">
-                            <SearchBar
+                            {
+                                localStorage.getItem("userRole") !== "visitante" ? 
+                                <></>
+                                :
+                                <SearchBar
                                 searchCriteria={searchCriteria}
                                 handleInputChange={handleInputChange}
                                 setShowEndDateModal={() => setShowEndDateModal(true)}
                                 setShowStartDateModal={() => setShowStartDateModal(true)}
                                 handleSearch={handleSearch}
                             />
+                            }
                         </IonCol>
                         <IonCol className="ion-hide-lg-up ion-text-center">
                             <IonButton fill="outline" shape="round" onClick={() => setShowSearchModal(true)}>
