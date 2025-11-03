@@ -12,6 +12,7 @@ import './Sidebar.css';
 
 const Sidebar = () => {
     const location = useLocation();
+    const userRole = localStorage.getItem('userRole');
 
     const menuItems = [
         { title: 'Perfil', path: '/user-dashboard/profile', icon: personCircleOutline, id: 'perfil' },
@@ -27,18 +28,23 @@ const Sidebar = () => {
     return (
         <div className="sidebar-container">
             <IonList lines="none">
-                {menuItems.map((item, index) => (
-                    <IonItem
-                        button
-                        routerLink={item.path}
-                        key={index}
-                        color={location.pathname === item.path ? 'primary' : ''}
-                        onClick={handleMenuClick}
-                    >
-                        <IonIcon icon={item.icon} slot="start" />
-                        <IonLabel>{item.title}</IonLabel>
-                    </IonItem>
-                ))}
+                {menuItems.map((item, index) => {
+                    if (item.id === 'reservaciones' && userRole === 'propietario') {
+                        return null;
+                    }
+                    return (
+                        <IonItem
+                            button
+                            routerLink={item.path}
+                            key={index}
+                            color={location.pathname === item.path ? 'primary' : ''}
+                            onClick={handleMenuClick}
+                        >
+                            <IonIcon icon={item.icon} slot="start" />
+                            <IonLabel>{item.title}</IonLabel>
+                        </IonItem>
+                    );
+                })}
             </IonList>
         </div>
     );
