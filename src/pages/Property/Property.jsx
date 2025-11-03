@@ -6,6 +6,7 @@ import {
     IonButton,
     useIonToast,
     IonLoading,
+    useIonViewWillEnter,
 } from "@ionic/react";
 import RequestsCardData from "../../components/RequestsCardData/RequestsCardData";
 import MainLayout from "../../layout/MainLayout";
@@ -62,9 +63,9 @@ const Property = () => {
         setProperties(response.data);
     }
 
-    useEffect(() => {
+    useIonViewWillEnter(() => {
         getMyProperties();
-    }, [])
+    })
 
     return (
         <MainLayout pageTitle="Mis Propiedades" activePage="propiedades">
