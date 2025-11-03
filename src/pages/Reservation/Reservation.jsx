@@ -18,6 +18,7 @@ import "./Reservation.css";
 import MainLayout from "../../layout/MainLayout";
 import bookingService from "../../services/bookingService";
 import propertyService from "../../services/propertyService";
+import ReservationDetailsModal from "../../components/ReservationDetailsModal/ReservationDetailsModal";
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   return new Date(dateStr).toLocaleDateString("es-ES", {
@@ -30,6 +31,8 @@ const Reservaciones = () => {
   const [allReservations, setAllReservations] = useState([]);
   const [propertiesMap, setPropertiesMap] = useState(new Map());
   const [filteredReservations, setFilteredReservations] = useState([]);
+  const [selectedReservationData, setSelectedReservationData] = useState(null);
+  const [allProperties, setAllProperties] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("pendiente");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -50,6 +53,8 @@ const Reservaciones = () => {
         ]);
 
         setAllReservations(bookingResponse.data || []);
+
+        setAllProperties(propertyResponse.data || []);
         const propMap = new Map();
         (propertyResponse.data || []).forEach((prop) => {
           propMap.set(prop.id, prop.name);
@@ -82,6 +87,17 @@ const Reservaciones = () => {
     });
     setFilteredReservations(transformed);
   }, [selectedStatus, allReservations, propertiesMap]);
+
+  const handleOpenDetails = (reservationId) => {
+    const reservation = allReservations.find(res => res.id === reservationId);
+    const property = allProperties.find(prop => prop.id === Number(reservation.propertyId));
+    if (reservation && property) {
+      setSelectedReservationData({ reservation, property });
+    } else {
+      console.error("No se pudieron encontrar los detalles de la reservación o la propiedad.");
+    }
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -131,10 +147,10 @@ const Reservaciones = () => {
                     </span>
                   </p>
                   <IonButton
-                    routerLink={`/reservacion/${res.id}`}
-                    fill="clear"
-                    size="small"
-                    className="details-button"
+                   onClick={() => handleOpenDetails(res.id)}
+                        fill="clear"
+                        size="small"
+                        className="details-button"
                   >
                     Ver Detalles
                   </IonButton>
@@ -154,6 +170,12 @@ const Reservaciones = () => {
     <MainLayout pageTitle="Mis Reservaciones" activePage="reservaciones">
       <IonLoading isOpen={isLoading} message={"Cargando..."} />
       {!isLoading && renderContent()}
+      <ReservationDetailsModal 
+        isOpen={!!selectedReservationData}
+        onClose={() => setSelectedReservationData(null)}
+        reservation={selectedReservationData?.reservation}
+        property={selectedReservationData?.property}
+      />
     </MainLayout>
   );
 };

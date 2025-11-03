@@ -1,0 +1,54 @@
+/* ReservationDetailsModal.css */
+
+.reservation-details-modal .modal-property-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.reservation-details-modal .details-card {
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.reservation-details-modal ion-card-title {
+    font-weight: bold;
+    color: var(--ion-color-primary);
+}
+
+.reservation-details-modal ion-card-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    color: var(--ion-color-medium-shade);
+}
+
+.reservation-details-modal ion-card-subtitle ion-icon {
+    font-size: 1.1em;
+}
+
+.reservation-details-modal .status-badge {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    color: #fff; /* Texto blanco para todos los badges */
+}
+
+/* Colores de fondo para los badges */
+.reservation-details-modal ion-note[color="success"] {
+    background-color: var(--ion-color-success);
+}
+.reservation-details-modal ion-note[color="warning"] {
+    background-color: var(--ion-color-warning);
+}
+.reservation-details-modal ion-note[color="danger"] {
+    background-color: var(--ion-color-danger);
+}
+
+.reservation-details-modal hr {
+    border: none;
+    border-top: 1px solid var(--ion-color-step-200, #eeeeee);
+}
