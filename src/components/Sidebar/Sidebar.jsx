@@ -7,7 +7,7 @@ import {
     IonIcon
 } from '@ionic/react';
 import { menuController } from '@ionic/core/components';
-import { personCircleOutline, homeOutline, calendarOutline, cardOutline } from 'ionicons/icons';
+import { personCircleOutline, homeOutline, calendarOutline, cardOutline, logOutOutline } from 'ionicons/icons';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -25,11 +25,23 @@ const Sidebar = () => {
         await menuController.close();
     };
 
+    const handleLogOut = async () => {
+        await menuController.close();
+        localStorage.removeItem("isSessionActive");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("hasAcceptedTerms");
+        window.location.reload();
+    }
+
     return (
         <div className="sidebar-container">
             <IonList lines="none">
                 {menuItems.map((item, index) => {
                     if (item.id === 'reservaciones' && userRole === 'propietario') {
+                        return null;
+                    }
+                    if (item.id === 'propiedades' && userRole === 'visitante') {
                         return null;
                     }
                     return (
@@ -45,6 +57,13 @@ const Sidebar = () => {
                         </IonItem>
                     );
                 })}
+                <IonItem
+                    button
+                    onClick={handleLogOut}
+                >
+                    <IonIcon icon={logOutOutline} slot="start" />
+                    <IonLabel>Cerrar Sesión</IonLabel>
+                </IonItem>
             </IonList>
         </div>
     );

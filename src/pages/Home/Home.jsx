@@ -61,6 +61,10 @@ const Home = () => {
         if (!hasAccepted) {
             setShowTermsModal(true);
         }
+
+        if (localStorage.getItem('userRole') === "propietario"){
+            history.push("/user-dashboard/profile")
+        }
     });
 
     const handleAcceptTerms = () => {

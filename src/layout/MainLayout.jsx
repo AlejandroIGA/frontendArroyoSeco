@@ -11,7 +11,8 @@ import {
   IonRow,
   IonCol,
   IonButton,
-  IonIcon
+  IonIcon,
+  IonText
 } from '@ionic/react';
 import { arrowBack } from 'ionicons/icons';
 import Sidebar from '../components/Sidebar/Sidebar';
@@ -25,10 +26,15 @@ const MainLayout = ({ children, activePage }) => {
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
-              <IonButton routerLink="/">
-                <IonIcon slot="start" icon={arrowBack} />
-                <span className="ion-hide-sm-down">Regresar</span>
-              </IonButton>
+              {
+                localStorage.getItem("userRole") != "visitante" ?
+                  <IonText>Panel de administración</IonText>
+                  :
+                  <IonButton routerLink="/">
+                    <IonIcon slot="start" icon={arrowBack} />
+                    <span className="ion-hide-sm-down">Regresar</span>
+                  </IonButton>
+              }
             </IonButtons>
             <IonButtons slot="end" className="ion-hide-md-up">
               <IonMenuButton />
