@@ -97,7 +97,7 @@ const AppShell = ({ children, onSearchResults }) => {
                         </IonCol>
                         <IonCol className="ion-hide-lg-down">
                             {
-                                localStorage.getItem("userRole") !== "visitante" ? 
+                                localStorage.getItem("userRole") == "propietario" ? 
                                 <></>
                                 :
                                 <SearchBar
