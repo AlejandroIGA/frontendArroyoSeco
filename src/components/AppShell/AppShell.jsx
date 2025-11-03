@@ -21,13 +21,18 @@ const AppShell = ({ children, onSearchResults }) => {
     const [showEndDateModal, setShowEndDateModal] = useState(false);
     const [showSearchModal, setShowSearchModal] = useState(false);
 
-    const handleDateChange = (e, field) => {
-        const value = e.detail.value.split('T')[0]; // Formato YYYY-MM-DD
-        setSearchCriteria(prev => ({ ...prev, [field]: value }));
-
+const handleDateChange = (e, field) => {
+    const value = e.detail.value;
+    if (typeof value !== 'string') {
         if (field === 'startDate') setShowStartDateModal(false);
         if (field === 'endDate') setShowEndDateModal(false);
-    };
+        return; 
+    }
+    const formattedValue = value.split('T')[0]; // Formato YYYY-MM-DD
+    setSearchCriteria(prev => ({ ...prev, [field]: formattedValue }));
+    if (field === 'startDate') setShowStartDateModal(false);
+    if (field === 'endDate') setShowEndDateModal(false);
+};
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -42,18 +47,23 @@ const AppShell = ({ children, onSearchResults }) => {
             const propertyResponse = await propertyService.searchProperties(propertyParams);
             let allMatchingProperties = propertyResponse.data;
             if (searchCriteria.startDate && searchCriteria.endDate) {
-                const bookingParams = {
-                    startDate: searchCriteria.startDate,
-                    endDate: searchCriteria.endDate,
-                };
-                const bookingResponse = await bookingService.searchBookings(bookingParams);
-                const conflictingBookings = bookingResponse.data; // Array de reservas
+                const userStartDate = new Date(searchCriteria.startDate + 'T00:00:00');
+                const userEndDate = new Date(searchCriteria.endDate + 'T00:00:00');
+                const allBookingsResponse = await bookingService.searchBookings({});
+                const allBookings = allBookingsResponse.data;
+                const conflictingBookings = allBookings.filter(booking => {
+                    if (booking.status !== 'Aceptada' && booking.status !== 'Pendiente') {
+                        return false;
+                    }
+                    const bookingStartDate = new Date(booking.startDate);
+                    const bookingEndDate = new Date(booking.endDate);
+                    const isOverlap = (bookingStartDate <= userEndDate) && (bookingEndDate >= userStartDate);
+                    return isOverlap;
+                });
                 const conflictingPropertyIds = new Set();
                 conflictingBookings.forEach(booking => {
                     if (booking.propertyId) {
                         conflictingPropertyIds.add(booking.propertyId);
-                    } else if (booking.property && booking.property.id) {
-                        conflictingPropertyIds.add(booking.property.id);
                     }
                 });
                 allMatchingProperties = allMatchingProperties.filter(property =>
@@ -64,6 +74,7 @@ const AppShell = ({ children, onSearchResults }) => {
                 onSearchResults(allMatchingProperties);
             }
             setShowSearchModal(false);
+
         } catch (error) {
             console.error("Error al buscar propiedades:", error);
         }
