@@ -32,6 +32,7 @@ const Property = () => {
                 position: 'top'
             });
             setOpenModal(false);
+            getMyProperties();
         }
         catch (error) {
             setIsLoading(false);
