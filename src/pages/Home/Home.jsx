@@ -33,7 +33,7 @@ const Home = () => {
         try {
             const response = await propertyService.getAll();
             setIsLoading(false);
-            const filteredProperties = response.data.filter(property => property.showProperty);
+            const filteredProperties = response.data.length > 0 ? response.data.filter(property => property.showProperty) : response.data;
             setProperties(filteredProperties);
         } catch (error) {
             setIsLoading(false);
@@ -46,6 +46,7 @@ const Home = () => {
             } else if (error.code === "ERR_NETWORK") {
                 errorMsg = 'Error de conexión.';
             } else {
+                console.log(error);
                 errorMsg = 'Ocurrió un error al cargar las propiedades.';
             }
             presentToast({
@@ -129,7 +130,7 @@ const Home = () => {
 
                     <IonRow className="ion-align-items-stretch">
 
-                        <IonCol size="9">
+                        <IonCol size="12" size-md="9">
 
                             {isLoading && <p>Cargando propiedades de la base de datos...</p>}
 
@@ -142,7 +143,7 @@ const Home = () => {
                             )}
                         </IonCol>
 
-                        <IonCol size="3" className="aside-container">
+                        <IonCol size="3" className="aside-container ion-hide-md-down">
                             <aside className="full-height-aside">
                                 <IonCard>
                                     <IonCardHeader><IonCardTitle>Arroyo Seco</IonCardTitle></IonCardHeader>

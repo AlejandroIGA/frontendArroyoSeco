@@ -258,7 +258,7 @@ const PropertyDetails = () => {
                                     </IonCard>
                                 </IonCol>
                                 {
-                                    localStorage.getItem("userRole") == "propietario" ?
+                                    localStorage.getItem("userRole") == "propietario"?
                                         <IonCol>
                                             <IonButton expand="block" onClick={() => setIsModalOpen(true)}>
                                                 Editar
