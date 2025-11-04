@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   frontend:
-    image: ghcr.io/alejandroiga/fronendarroyoseco:latest
+    image: ghcr.io/alejandroiga/frontendarroyoseco:latest
     container_name: arroyoseco-frontend
     ports:
       - "80:80"
