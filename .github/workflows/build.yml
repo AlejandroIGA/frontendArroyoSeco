@@ -31,7 +31,7 @@ jobs:
         context: .
         push: true
         build-args: |
-          VITE_API_URL=https://backendarroyoseco.onrender.com/api
+          VITE_API_URL=http://146.190.115.150:8080/api
         tags: |
           ghcr.io/${{ env.REPO_LOWER }}:latest
           ghcr.io/${{ env.REPO_LOWER }}:${{ github.sha }}
