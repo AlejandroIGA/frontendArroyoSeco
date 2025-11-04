@@ -18,7 +18,8 @@ import {
     IonCol,
     IonRouterLink,
     IonLoading,
-    useIonToast
+    useIonToast,
+    useIonViewWillEnter
 } from '@ionic/react';
 
 import { mailOutline, lockClosedOutline } from 'ionicons/icons';
@@ -114,10 +115,10 @@ const Login = () => {
         }
     };
 
-    useEffect(() => {
+    useIonViewWillEnter(() => {
         setFormData({ email: '', password: '' });
         setErrors({ email: '', password: '' });
-    }, []);
+    });
 
     return (
         <IonPage>

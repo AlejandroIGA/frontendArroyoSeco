@@ -44,14 +44,13 @@ const Home = () => {
                     errorMsg = "Error inesperado.";
                 }
             } else if (error.code === "ERR_NETWORK") {
-                errorMsg = 'Error de conexión.';
+                errorMsg = `Error de conexión ${import.meta.env.VITE_API_URL}`;
             } else {
-                console.log(error);
                 errorMsg = 'Ocurrió un error al cargar las propiedades.';
             }
             presentToast({
                 message: errorMsg,
-                duration: 3000,
+                duration: 5000,
                 color: 'danger',
                 position: 'top'
             });
