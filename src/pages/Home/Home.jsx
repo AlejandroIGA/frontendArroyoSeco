@@ -21,6 +21,8 @@ const Home = () => {
     const [navigatingTo, setNavigatingTo] = useState(null);
     const [presentToast] = useIonToast();
 
+    let errorMsg = "";
+
     const carouselImages = [
         '/img/arroyoSeco1.jpg',
         '/img/arroyoSeco2.png',
@@ -37,7 +39,6 @@ const Home = () => {
             setIsLoading(false);
             if (error.response) {
                 if (error.response.status === 401) {
-                    console.log(error);
                     errorMsg = "Credenciales incorrectas.";
                 } else {
                     errorMsg = "Error inesperado.";
@@ -45,7 +46,7 @@ const Home = () => {
             } else if (error.code === "ERR_NETWORK") {
                 errorMsg = 'Error de conexión.';
             } else {
-                errorMsg = 'Ocurrió un error en la aplicación.';
+                errorMsg = 'Ocurrió un error al cargar las propiedades.';
             }
             presentToast({
                 message: errorMsg,
