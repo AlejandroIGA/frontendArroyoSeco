@@ -21,6 +21,8 @@ const Home = () => {
     const [navigatingTo, setNavigatingTo] = useState(null);
     const [presentToast] = useIonToast();
 
+    let errorMsg = "";
+
     const carouselImages = [
         '/img/arroyoSeco1.jpg',
         '/img/arroyoSeco2.png',
