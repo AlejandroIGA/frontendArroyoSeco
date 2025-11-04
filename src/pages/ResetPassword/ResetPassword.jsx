@@ -8,9 +8,10 @@ import {
 } from '@ionic/react';
 import { mailOutline, lockClosedOutline, shieldCheckmarkOutline, closeCircleOutline } from 'ionicons/icons';
 import authService from '../../services/authService';
+import { useHistory } from 'react-router-dom';
 
 const ResetPassword = () => {
-    
+    const history = useHistory();
     // --- ESTADO ---
     const [loading, setLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);

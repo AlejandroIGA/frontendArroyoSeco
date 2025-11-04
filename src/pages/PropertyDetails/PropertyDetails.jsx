@@ -258,7 +258,7 @@ const PropertyDetails = () => {
                                     </IonCard>
                                 </IonCol>
                                 {
-                                    localStorage.getItem("userRole") == "propietario"?
+                                    localStorage.getItem("userRole") == "propietario" && property.ownerId == localStorage.getItem("userId")?
                                         <IonCol>
                                             <IonButton expand="block" onClick={() => setIsModalOpen(true)}>
                                                 Editar
@@ -268,12 +268,15 @@ const PropertyDetails = () => {
                                             </IonButton>
                                         </IonCol>
                                         :
+                                    localStorage.getItem("userRole") == "visitante" ?  
                                         <IonCol size="12" size-md="4">
                                             <ReservationForm
                                                 propertyId={property.id}
                                                 pricePerNight={parseFloat(property.pricePerNight)}
                                             />
                                         </IonCol>
+                                        :
+                                        <></>
                                 }
 
                             </IonRow>
