@@ -4,7 +4,9 @@ import {
     IonBackButton, IonList, IonItem, IonInput, IonButton,
     IonIcon, IonGrid, IonRow, IonCol,
     IonRouterLink,
-    IonLoading, useIonToast, IonSelect, IonSelectOption
+    IonLoading, useIonToast, IonSelect, IonSelectOption,
+    useIonViewWillEnter,
+    IonLabel
 } from '@ionic/react';
 import { personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline, briefcaseOutline } from 'ionicons/icons';
 import './Register.css'; // Usaremos un CSS idéntico al del login
@@ -40,20 +42,20 @@ const RegisterPage = () => {
     });
 
     const handleInputChange = (e) => {
-    const name = e.target.name || e.detail.name;
-    const value = e.detail.value !== undefined ? e.detail.value : e.target.value;
+        const name = e.target.name || e.detail.name;
+        const value = e.detail.value !== undefined ? e.detail.value : e.target.value;
 
-    if (name) {
-        setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
+        if (name) {
+            setFormData(prev => ({ ...prev, [name]: value }));
+            if (errors[name]) {
+                setErrors(prev => ({ ...prev, [name]: '' }));
+            }
         }
-    }
-};
+    };
 
     // 3. Actualizamos la función de validación
     const validateForm = () => {
-        const newErrors = { name: '', lastName: '', cellphone: '', country: '', email: '', password: '', role:'' };
+        const newErrors = { name: '', lastName: '', cellphone: '', country: '', email: '', password: '', role: '' };
         let isValid = true;
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
 
@@ -90,7 +92,7 @@ const RegisterPage = () => {
             newErrors.password = 'Debe tener min. 12 caracteres, incluir mayúscula, minúscula, número y caracter especial (@$!%*?&).';
             isValid = false;
         }
-        if (!formData.role){
+        if (!formData.role) {
             newErrors.role = 'El role es obligatorio';
             isValid = false;
         }
@@ -132,13 +134,13 @@ const RegisterPage = () => {
                     console.log(error);
                     setErrors(prev => ({ ...prev, api: error.response.data }));
                 } else {
-                    setErrors(prev => ({ ...prev, api: error.response.data }));
+                    setErrors(prev => ({ ...prev, api: error.response.data || "Error al comunicar con el servidor" }));
                 }
             }
         }
     };
 
-    useEffect(() => {
+    useIonViewWillEnter(() => {
         setFormData({
             name: '',
             lastName: '',
@@ -148,8 +150,8 @@ const RegisterPage = () => {
             password: '',
             role: ''
         });
-        setErrors({ name: '', lastName: '', cellphone: '', country: '', email: '', password: '', role:'' });
-    }, [])
+        setErrors({ name: '', lastName: '', cellphone: '', country: '', email: '', password: '', role: '' });
+    })
 
     return (
         <IonPage>
@@ -171,13 +173,13 @@ const RegisterPage = () => {
                                     {/* --- NUEVOS CAMPOS --- */}
                                     <IonItem>
                                         <IonIcon icon={personOutline} slot="start" />
-                                        <IonInput label="Nombre" labelPlacement="floating" name="name" type="text" value={formData.name} onIonInput={handleInputChange} />
+                                        <IonInput maxlength={25} label="Nombre" labelPlacement="floating" name="name" type="text" value={formData.name} onIonInput={handleInputChange} />
                                     </IonItem>
                                     {errors.name && <p className="error-message">{errors.name}</p>}
 
                                     <IonItem>
                                         <IonIcon icon={personOutline} slot="start" />
-                                        <IonInput label="Apellidos" labelPlacement="floating" name="lastName" type="text" value={formData.lastName} onIonInput={handleInputChange} />
+                                        <IonInput maxlength={30} label="Apellidos" labelPlacement="floating" name="lastName" type="text" value={formData.lastName} onIonInput={handleInputChange} />
                                     </IonItem>
                                     {errors.lastName && <p className="error-message">{errors.lastName}</p>}
 
@@ -202,7 +204,7 @@ const RegisterPage = () => {
                                     {errors.country && <p className="error-message">{errors.country}</p>}
                                     <IonItem>
                                         <IonIcon icon={mailOutline} slot="start" />
-                                        <IonInput label="Correo Electrónico" labelPlacement="floating" name="email" type="email" value={formData.email} onIonInput={handleInputChange} />
+                                        <IonInput maxlength={30} label="Correo Electrónico" labelPlacement="floating" name="email" type="email" value={formData.email} onIonInput={handleInputChange} />
                                     </IonItem>
                                     {errors.email && <p className="error-message">{errors.email}</p>}
 
@@ -213,20 +215,29 @@ const RegisterPage = () => {
                                     {errors.password && <p className="error-message">{errors.password}</p>}
                                 </IonList>
                                 <IonItem>
-                                        <IonIcon icon={briefcaseOutline} slot="start" />
-                                        <IonSelect
-                                            label="Tipo de Cuenta"
-                                            labelPlacement="floating"
-                                            name="role"
-                                            value={formData.role}
-                                            onIonChange={handleInputChange}
-                                            placeholder="Selecciona un tipo"
-                                        >
-                                            <IonSelectOption value="visitante">Visitante</IonSelectOption>
-                                            <IonSelectOption value="propietario">Propietario</IonSelectOption>
-                                        </IonSelect>
-                                    </IonItem>
-                                    {errors.role && <p className="error-message">{errors.role}</p>}
+                                    <IonIcon icon={briefcaseOutline} slot="start" />
+                                    <IonSelect
+                                        label="Tipo de Cuenta"
+                                        labelPlacement="floating"
+                                        name="role"
+                                        value={formData.role}
+                                        onIonChange={handleInputChange}
+                                    >
+                                        <IonSelectOption value="visitante">
+                                            <IonLabel>
+                                                <h3>Visitante: </h3>
+                                                <p>Buscaré y reservaré alojamientos.</p>
+                                            </IonLabel>
+                                        </IonSelectOption>
+                                        <IonSelectOption value="propietario">
+                                            <IonLabel>
+                                                <h3>Propietario: </h3>
+                                                <p>Quiero publicar y administrar mis alojamientos.</p>
+                                            </IonLabel>
+                                        </IonSelectOption>
+                                    </IonSelect>
+                                </IonItem>
+                                {errors.role && <p className="error-message">{errors.role}</p>}
                                 {errors.api && (
                                     <p className="error-message ion-text-center">
                                         {errors.api}

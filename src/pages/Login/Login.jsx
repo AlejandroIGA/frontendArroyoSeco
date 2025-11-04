@@ -92,9 +92,11 @@ const Login = () => {
                 setIsLoading(false);
                 if (error.response) {
                     if (error.response.status === 401) {
-                        console.log(error);
                        errorMsg = "Credenciales incorrectas.";
-                    } else {
+                    } else if (error.response.status === 404){
+                        errorMsg = "Error en comunicación con servidor";
+                    }
+                    else {
                         errorMsg = "Error inesperado.";
                     }
                 } else if (error.code === "ERR_NETWORK") {

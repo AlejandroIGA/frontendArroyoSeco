@@ -2,14 +2,23 @@ import apiClient from "../../axiosConfig";
 
 const propertyService = {
     "getAll": async () => {
-        const response = await apiClient.get('/properties');
-        return response;
+        try{
+            const response = await apiClient.get('/properties');
+            return response;
+        }catch(error){
+            throw error;
+        }
+        
     },
     "searchProperties": async (searchParams) => {
-        const response = await apiClient.get('/properties/search', {
-            params: searchParams
-        });
-        return response;
+        try{
+            const response = await apiClient.get('/properties/search', {
+                params: searchParams
+            });
+            return response;
+        }catch(error){
+            throw error;
+        }
     },
     "save": async (data) => {
         try{
