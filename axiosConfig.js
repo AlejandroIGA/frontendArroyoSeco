@@ -6,7 +6,8 @@ export const AUTHORIZE = 'http://localhost:8080/oauth2/authorize';
 
 
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    // baseURL: 'http://localhost:8080/api',
+    baseURL: 'https://alojando.duckdns.org/api',
     headers: {
         'Content-Type': 'application/json',
     },

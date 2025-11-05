@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { useHistory } from 'react-router-dom';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonLoading, 
-IonModal, IonPage, IonRow, IonTitle, IonToolbar, useIonToast, useIonViewWillEnter, IonImg } from "@ionic/react"
+import {
+    IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonLoading,
+    IonModal, IonPage, IonRow, IonTitle, IonToolbar, useIonToast, useIonViewWillEnter, IonImg
+} from "@ionic/react"
 import AppShell from "../../components/AppShell/AppShell"
 import PropertyCardData from "../../components/PropertyCardData/PropertyCardData"
 import propertyService from "../../services/propertyService";
@@ -21,6 +23,8 @@ const Home = () => {
     const [navigatingTo, setNavigatingTo] = useState(null);
     const [presentToast] = useIonToast();
 
+    let errorMsg = "";
+
     const carouselImages = [
         '/img/arroyoSeco1.jpg',
         '/img/arroyoSeco2.png',
@@ -31,25 +35,25 @@ const Home = () => {
         try {
             const response = await propertyService.getAll();
             setIsLoading(false);
-            const filteredProperties = response.data.filter(property => property.showProperty);
+            const filteredProperties = response.data.length > 0 ? response.data.filter(property => property.showProperty) : response.data;
             setProperties(filteredProperties);
         } catch (error) {
             setIsLoading(false);
+            console.error("ERROR HOME:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
             if (error.response) {
                 if (error.response.status === 401) {
-                    console.log(error);
                     errorMsg = "Credenciales incorrectas.";
                 } else {
                     errorMsg = "Error inesperado.";
                 }
             } else if (error.code === "ERR_NETWORK") {
-                errorMsg = 'Error de conexión.';
+                errorMsg = `Error de conexión ${import.meta.env.VITE_API_URL}`;
             } else {
-                errorMsg = 'Ocurrió un error en la aplicación.';
+                errorMsg = 'Ocurrió un error al cargar las propiedades.';
             }
             presentToast({
                 message: errorMsg,
-                duration: 3000,
+                duration: 5000,
                 color: 'danger',
                 position: 'top'
             });
@@ -62,7 +66,7 @@ const Home = () => {
             setShowTermsModal(true);
         }
 
-        if (localStorage.getItem('userRole') === "propietario"){
+        if (localStorage.getItem('userRole') === "propietario") {
             history.push("/user-dashboard/profile")
         }
 
@@ -86,9 +90,9 @@ const Home = () => {
                 name: p.name,
                 pricePerNight: p.pricePerNight ? p.pricePerNight.toFixed(2) : "N/A",
                 numberOfGuests: p.numberOfGuests,
-                imagen: p.imagen && p.imagen.length > 0 
-                ? [ p.imagen[0] ]
-                : [ "placeholder.jpg" ]
+                imagen: p.imagen && p.imagen.length > 0
+                    ? [p.imagen[0]]
+                    : ["placeholder.jpg"]
             }));
             setProperties(normalizedData);
             console.log("Datos de la busqueda:", normalizedData);
@@ -128,7 +132,7 @@ const Home = () => {
 
                     <IonRow className="ion-align-items-stretch">
 
-                        <IonCol size="9">
+                        <IonCol size="12" size-md="9">
 
                             {isLoading && <p>Cargando propiedades de la base de datos...</p>}
 
@@ -141,7 +145,7 @@ const Home = () => {
                             )}
                         </IonCol>
 
-                        <IonCol size="3" className="aside-container">
+                        <IonCol size="3" className="aside-container ion-hide-md-down">
                             <aside className="full-height-aside">
                                 <IonCard>
                                     <IonCardHeader><IonCardTitle>Arroyo Seco</IonCardTitle></IonCardHeader>
