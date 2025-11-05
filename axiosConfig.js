@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'https://146.190.115.150/api',
+    baseURL: 'https://alojando.duckdns.org/api',
 
     headers: {
         'Content-Type': 'application/json',

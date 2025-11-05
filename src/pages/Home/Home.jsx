@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { useHistory } from 'react-router-dom';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonLoading, 
-IonModal, IonPage, IonRow, IonTitle, IonToolbar, useIonToast, useIonViewWillEnter, IonImg } from "@ionic/react"
+import {
+    IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonLoading,
+    IonModal, IonPage, IonRow, IonTitle, IonToolbar, useIonToast, useIonViewWillEnter, IonImg
+} from "@ionic/react"
 import AppShell from "../../components/AppShell/AppShell"
 import PropertyCardData from "../../components/PropertyCardData/PropertyCardData"
 import propertyService from "../../services/propertyService";
@@ -37,6 +39,7 @@ const Home = () => {
             setProperties(filteredProperties);
         } catch (error) {
             setIsLoading(false);
+            console.error("ERROR HOME:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
             if (error.response) {
                 if (error.response.status === 401) {
                     errorMsg = "Credenciales incorrectas.";
@@ -63,7 +66,7 @@ const Home = () => {
             setShowTermsModal(true);
         }
 
-        if (localStorage.getItem('userRole') === "propietario"){
+        if (localStorage.getItem('userRole') === "propietario") {
             history.push("/user-dashboard/profile")
         }
 
@@ -87,9 +90,9 @@ const Home = () => {
                 name: p.name,
                 pricePerNight: p.pricePerNight ? p.pricePerNight.toFixed(2) : "N/A",
                 numberOfGuests: p.numberOfGuests,
-                imagen: p.imagen && p.imagen.length > 0 
-                ? [ p.imagen[0] ]
-                : [ "placeholder.jpg" ]
+                imagen: p.imagen && p.imagen.length > 0
+                    ? [p.imagen[0]]
+                    : ["placeholder.jpg"]
             }));
             setProperties(normalizedData);
             console.log("Datos de la busqueda:", normalizedData);
