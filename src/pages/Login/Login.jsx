@@ -9,7 +9,6 @@ import {
     IonBackButton,
     IonList,
     IonItem,
-    IonLabel,
     IonInput,
     IonButton,
     IonIcon,
@@ -17,22 +16,17 @@ import {
     IonRow,
     IonCol,
     IonRouterLink,
-    IonLoading,
-    useIonToast
+    IonLoading
 } from '@ionic/react';
-
 import { mailOutline, lockClosedOutline } from 'ionicons/icons';
 import './Login.css';
-import authService from '../../services/authService.js';
-
+import authService from '../../services/authService';
 import { useHistory } from 'react-router-dom';
+import { AUTHORIZE, CLIENT_ID, REDIRECT_URI } from '../../../axiosConfig'; 
 
 const Login = () => {
-    let errorMsg = 'Ocurrió un error inesperado.';
-
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
-    const [presentToast] = useIonToast();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -41,7 +35,8 @@ const Login = () => {
 
     const [errors, setErrors] = useState({
         email: '',
-        password: ''
+        password: '',
+        api: '' 
     });
 
     const handleInputChange = (e) => {
@@ -53,7 +48,7 @@ const Login = () => {
     };
 
     const validateForm = () => {
-        const newErrors = { email: '', password: '' };
+        const newErrors = { email: '', password: '', api: '' };
         let isValid = true;
 
         if (!formData.email) {
@@ -67,7 +62,7 @@ const Login = () => {
         if (!formData.password) {
             newErrors.password = 'La contraseña es obligatoria.';
             isValid = false;
-        } else if (formData.password.length < 12) {
+        } else if (formData.password.length < 4) { 
             newErrors.password = 'La contraseña debe tener al menos 4 caracteres.';
             isValid = false;
         }
@@ -75,46 +70,47 @@ const Login = () => {
         setErrors(newErrors);
         return isValid;
     };
+
     const handleLogin = async () => {
         setErrors(prev => ({ ...prev, api: '' }));
         if (validateForm()) {
             setIsLoading(true);
             try {
-                const response = await authService.login(formData);
-                const { id, rol } = response.data;
-                setIsLoading(false);
-                setFormData({ email: '', password: '' });
-                localStorage.setItem("isSessionActive", "true");
-                localStorage.setItem("userId", id);
-                localStorage.setItem("userRole", rol);
-                history.push('/');
+                const response = await authService.login(formData); 
+                
+                if (response.status === 200) {
+                    // Redirigir al Authorization Server
+                    const authUrl = `${AUTHORIZE}?` + new URLSearchParams({
+                        response_type: 'code',
+                        client_id: CLIENT_ID,
+                        redirect_uri: REDIRECT_URI,
+                        scope: 'read write',
+                    });
+                    
+                    setIsLoading(false);
+                    window.location.href = authUrl; 
+                    return;
+                }
             } catch (error) {
                 setIsLoading(false);
                 if (error.response) {
                     if (error.response.status === 401) {
-                        console.log(error);
-                       errorMsg = "Credenciales incorrectas.";
+                        setErrors(prev => ({ ...prev, api: 'Credenciales inválidas.' }));
                     } else {
-                        errorMsg = "Error inesperado.";
+                        setErrors(prev => ({ ...prev, api: error.response.data.message || 'Error de autenticación.' }));
                     }
                 } else if (error.code === "ERR_NETWORK") {
-                    errorMsg = 'Error de conexión.';
+                    setErrors(prev => ({ ...prev, api: 'Error de conexión.' }));
                 } else {
-                    errorMsg = 'Ocurrió un error en la aplicación.';
+                    setErrors(prev => ({ ...prev, api: 'Ocurrió un error inesperado.' }));
                 }
-                presentToast({
-                message: errorMsg,
-                duration: 3000,
-                color: 'danger',
-                position: 'top'
-            });
             }
         }
     };
 
     useEffect(() => {
         setFormData({ email: '', password: '' });
-        setErrors({ email: '', password: '' });
+        setErrors({ email: '', password: '', api: '' });
     }, []);
 
     return (
@@ -160,6 +156,11 @@ const Login = () => {
                                     </IonItem>
                                     {errors.password && <p className="error-message">{errors.password}</p>}
                                 </IonList>
+                                {errors.api && (
+                                    <p className="error-message ion-text-center">
+                                        {errors.api}
+                                    </p>
+                                )}
                                 <IonButton
                                     expand="block"
                                     onClick={handleLogin}

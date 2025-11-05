@@ -34,6 +34,7 @@ const UserProfile = React.lazy(() => import('./pages/UserProfile/UserProfile'));
 const ResetPassword = React.lazy(() => import('./pages/ResetPassword/ResetPassword'));
 const PrivacyPoliciy = React.lazy(() => import('./pages/Legal/PrivacyPolicy'));
 const Terms = React.lazy(() => import('./pages/Legal/Terms'));
+const Callback = React.lazy(() => import('./pages/Login/Callback'));
 
 
 setupIonicReact();
@@ -54,6 +55,7 @@ function App() {
           <Route path="/reset-password" exact component={ResetPassword}/>
           <Route path="/privacy-policy" exact component={PrivacyPoliciy}/>
           <Route path="/terms" exact component={Terms}/>
+          <Route path="/callback" exact component={Callback}/>
 
           <PrivateRoute path="/user-dashboard/reservation" exact component={Reservation}/>
           <PrivateRoute path="/user-dashboard/property" exact component={Property}/>
