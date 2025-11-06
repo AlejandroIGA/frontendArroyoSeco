@@ -31,7 +31,7 @@ const propertyService = {
     },
     "getMyProperties": async () => {
         try{
-            const response = await apiClient.get(`/properties/user/${localStorage.getItem('userId')}`);
+            const response = await apiClient.get(`/properties/user/myproperties`);
             return response;
         }catch (error){
             throw error;
