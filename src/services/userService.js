@@ -1,18 +1,18 @@
-import apiClient  from "../../axiosConfig";
+import apiClient from "../../axiosConfig";
 
 const userService = {
-    "update" : async (data) => {
+    "update": async (data) => {
         try {
-            const response = await apiClient.put(`/user-profiles/${localStorage.getItem('userId')}/profile`, data);
+            const response = await apiClient.put(`/user-profiles/profile`, data); 
             return response;
         } catch (error) {
             throw error;
         }
     },
+    
     "getProfile": async () => {
         try {
-            //por el momento se va a obtener con base al id del usuario, esto debe modificarse por seguridad
-            const response = await apiClient.get(`/user-profiles/${localStorage.getItem('userId')}/profile`); 
+            const response = await apiClient.get(`/user-profiles/profile`); 
             return response;
         } catch (error) {
             throw error;
