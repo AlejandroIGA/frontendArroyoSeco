@@ -1,7 +1,9 @@
-import { IonButton, IonCol, IonContent, IonFooter, IonGrid, IonHeader, 
-    IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRouterLink, 
-    IonRow, useIonViewWillLeave, IonModal, IonDatetime, 
-    IonToolbar} from "@ionic/react";
+import {
+    IonButton, IonCol, IonContent, IonFooter, IonGrid, IonHeader,
+    IonIcon, IonImg, IonItem, IonLabel, IonList, IonPopover, IonRouterLink,
+    IonRow, useIonViewWillLeave, IonModal, IonDatetime,
+    IonToolbar
+} from "@ionic/react";
 import { personOutline, logInOutline, person, searchOutline, personCircleOutline, personAddOutline } from 'ionicons/icons';
 
 import './AppShell.css'
@@ -24,18 +26,18 @@ const AppShell = ({ children, onSearchResults }) => {
     const [showEndDateModal, setShowEndDateModal] = useState(false);
     const [showSearchModal, setShowSearchModal] = useState(false);
 
-const handleDateChange = (e, field) => {
-    const value = e.detail.value;
-    if (typeof value !== 'string') {
+    const handleDateChange = (e, field) => {
+        const value = e.detail.value;
+        if (typeof value !== 'string') {
+            if (field === 'startDate') setShowStartDateModal(false);
+            if (field === 'endDate') setShowEndDateModal(false);
+            return;
+        }
+        const formattedValue = value.split('T')[0]; // Formato YYYY-MM-DD
+        setSearchCriteria(prev => ({ ...prev, [field]: formattedValue }));
         if (field === 'startDate') setShowStartDateModal(false);
         if (field === 'endDate') setShowEndDateModal(false);
-        return; 
-    }
-    const formattedValue = value.split('T')[0]; // Formato YYYY-MM-DD
-    setSearchCriteria(prev => ({ ...prev, [field]: formattedValue }));
-    if (field === 'startDate') setShowStartDateModal(false);
-    if (field === 'endDate') setShowEndDateModal(false);
-};
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -87,65 +89,71 @@ const handleDateChange = (e, field) => {
         setPopoverState({ showPopover: false, event: undefined });
     });
 
-    const handleLogOut = () => {
-        sessionStorage.removeItem("isSessionActive");
-        localStorage.removeItem("hasAcceptedTerms");
-        sessionStorage.removeItem("token")
-        sessionStorage.removeItem("refresh_token")
-        sessionStorage.removeItem("userRole")
-        window.location.href = 'https://alojando.duckdns.org/api/auth/logout';
+    const handleLogOut = async () => {
+        try {
+            await apiClient.post('/auth/logout');
+        } catch (error) {
+            console.error("Error al cerrar sesión en el servidor:", error);
+        } finally {
+            sessionStorage.removeItem("isSessionActive");
+            localStorage.removeItem("hasAcceptedTerms");
+            sessionStorage.removeItem("token")
+            sessionStorage.removeItem("refresh_token")
+            sessionStorage.removeItem("userRole")
+            window.location.href = '/'; // Redirige a la raíz de tu app, no al backend
+        }
     }
 
     return (
         <>
             <IonHeader>
                 <IonToolbar>
-                <IonGrid >
-                    <IonRow className="ion-align-items-center">
-                        <IonCol size="2" class="ion-justify-content-end">
-                            <IonRouterLink routerLink={userRole !== "visitante" ? "/user-dashboard/property"  : "/" }>
-                                <IonImg
-                                    src="/logo.png"
-                                    alt="Arroyo Seco"
-                                    className="header-logo"
-                                />
-                            </IonRouterLink>
-                        </IonCol>
-                        <IonCol className="ion-hide-lg-down">
-                            {
-                                userRole == "propietario" ? 
-                                <></>
-                                :
-                                <SearchBar
-                                searchCriteria={searchCriteria}
-                                handleInputChange={handleInputChange}
-                                setShowEndDateModal={() => setShowEndDateModal(true)}
-                                setShowStartDateModal={() => setShowStartDateModal(true)}
-                                handleSearch={handleSearch}
-                            />
-                            }
-                        </IonCol>
-                        <IonCol className="ion-hide-lg-up ion-text-center">
-                            <IonButton fill="outline" shape="round" onClick={() => setShowSearchModal(true)}>
-                                Buscar estancias
-                                <IonIcon slot="end" icon={searchOutline} />
-                            </IonButton>
-                        </IonCol>
-                        <IonCol size="2" className="ion-text-center">
-                            <IonButton
-                                fill="clear"
-                                arial_label="account"
-                                onClick={(e) => {
-                                    e.persist();
-                                    setPopoverState({ showPopover: true, event: e });
+                    <IonGrid >
+                        <IonRow className="ion-align-items-center">
+                            <IonCol size="2" class="ion-justify-content-end">
+                                <IonRouterLink routerLink={userRole !== "visitante" ? "/user-dashboard/property" : "/"}>
+                                    <IonImg
+                                        src="/logo.png"
+                                        alt="Arroyo Seco"
+                                        className="header-logo"
+                                    />
+                                </IonRouterLink>
+                            </IonCol>
+                            <IonCol className="ion-hide-lg-down">
+                                {
+                                    userRole == "propietario" ?
+                                        <></>
+                                        :
+                                        <SearchBar
+                                            searchCriteria={searchCriteria}
+                                            handleInputChange={handleInputChange}
+                                            setShowEndDateModal={() => setShowEndDateModal(true)}
+                                            setShowStartDateModal={() => setShowStartDateModal(true)}
+                                            handleSearch={handleSearch}
+                                        />
                                 }
-                                }
-                            >
-                                <IonIcon slot="icon-only" icon={localStorage.getItem("isSessionActive") ? person : personOutline} color="primary" size="large" />
-                            </IonButton>
-                        </IonCol>
-                    </IonRow>
-                </IonGrid>
+                            </IonCol>
+                            <IonCol className="ion-hide-lg-up ion-text-center">
+                                <IonButton fill="outline" shape="round" onClick={() => setShowSearchModal(true)}>
+                                    Buscar estancias
+                                    <IonIcon slot="end" icon={searchOutline} />
+                                </IonButton>
+                            </IonCol>
+                            <IonCol size="2" className="ion-text-center">
+                                <IonButton
+                                    fill="clear"
+                                    arial_label="account"
+                                    onClick={(e) => {
+                                        e.persist();
+                                        setPopoverState({ showPopover: true, event: e });
+                                    }
+                                    }
+                                >
+                                    <IonIcon slot="icon-only" icon={localStorage.getItem("isSessionActive") ? person : personOutline} color="primary" size="large" />
+                                </IonButton>
+                            </IonCol>
+                        </IonRow>
+                    </IonGrid>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
@@ -229,14 +237,14 @@ const handleDateChange = (e, field) => {
                                 </>
                                 :
                                 <>
-                                <IonItem button={true} detail={false} routerLink="/login">
-                                    <IonIcon slot="start" icon={logInOutline} />
-                                    <IonLabel>Iniciar Sesión</IonLabel>
-                                </IonItem>
-                                <IonItem button={true} detail={false} routerLink="/register">
-                                    <IonIcon slot="start" icon={personAddOutline} />
-                                    <IonLabel>Registrarse</IonLabel>
-                                </IonItem>
+                                    <IonItem button={true} detail={false} routerLink="/login">
+                                        <IonIcon slot="start" icon={logInOutline} />
+                                        <IonLabel>Iniciar Sesión</IonLabel>
+                                    </IonItem>
+                                    <IonItem button={true} detail={false} routerLink="/register">
+                                        <IonIcon slot="start" icon={personAddOutline} />
+                                        <IonLabel>Registrarse</IonLabel>
+                                    </IonItem>
                                 </>
                         }
                     </IonList>

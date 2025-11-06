@@ -25,13 +25,19 @@ const Sidebar = () => {
         await menuController.close();
     };
 
-    const handleLogOut = () => {
-        sessionStorage.removeItem("isSessionActive");
-        localStorage.removeItem("hasAcceptedTerms");
-        sessionStorage.removeItem("token")
-        sessionStorage.removeItem("refresh_token")
-        sessionStorage.removeItem("userRole")
-        window.location.href = 'https://alojando.duckdns.org/api/auth/logout';
+    const handleLogOut = async () => {
+        try {
+            await apiClient.post('/auth/logout');
+        } catch (error) {
+            console.error("Error al cerrar sesión en el servidor:", error);
+        } finally {
+            sessionStorage.removeItem("isSessionActive");
+            localStorage.removeItem("hasAcceptedTerms");
+            sessionStorage.removeItem("token")
+            sessionStorage.removeItem("refresh_token")
+            sessionStorage.removeItem("userRole")
+            window.location.href = '/'; // Redirige a la raíz de tu app, no al backend
+        }
     }
 
     return (
