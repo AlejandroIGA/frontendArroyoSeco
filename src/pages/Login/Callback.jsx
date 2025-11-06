@@ -13,8 +13,9 @@ const Callback = () => {
             setMessage('Canjeando código por tokens...');
             const tokens = await authService.exchangeCode(code);
             
-            localStorage.setItem('token', tokens.access_token);
-            localStorage.setItem('refresh_token', tokens.refresh_token);
+            sessionStorage.setItem('token', tokens.access_token);
+            sessionStorage.setItem('refresh_token', tokens.refresh_token);
+            sessionStorage.setItem('isSessionActive', true);
 
             const userRole = tokens.user_role;
             let targetPath = '/login'; 

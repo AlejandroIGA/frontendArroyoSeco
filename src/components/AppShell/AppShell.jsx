@@ -86,11 +86,11 @@ const handleDateChange = (e, field) => {
     });
 
     const handleLogOut = () => {
-        localStorage.removeItem("isSessionActive");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("userRole");
+        sessionStorage.removeItem("isSessionActive");
         localStorage.removeItem("hasAcceptedTerms");
-        window.location.reload();
+        sessionStorage.removeItem("token")
+        sessionStorage.removeItem("refresh_token")
+        window.location.href = 'https://alojando.duckdns.org/api/auth/logout';
     }
 
     return (
