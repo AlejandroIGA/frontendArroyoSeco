@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export const CLIENT_ID = 'srta';
-export const REDIRECT_URI = 'http://localhost:5173/callback';
-export const AUTHORIZE = 'http://localhost:8080/oauth2/authorize'; 
+export const REDIRECT_URI = 'https://alojando.duckdns.org/callback';
+export const AUTHORIZE = 'https://alojando.duckdns.org/oauth2/authorize'; 
 
 
 const apiClient = axios.create({
