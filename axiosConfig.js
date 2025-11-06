@@ -1,27 +1,50 @@
 import axios from 'axios';
 
-const apiClient = axios.create({
-    baseURL: 'https://alojando.duckdns.org/api',
+export const CLIENT_ID = 'srta';
+export const REDIRECT_URI = 'https://alojando.duckdns.org/callback';
+export const AUTHORIZE = 'https://alojando.duckdns.org/oauth2/authorize'; 
 
+
+const apiClient = axios.create({
+    // baseURL: 'http://localhost:8080/api',
+    baseURL: 'https://alojando.duckdns.org/api',
     headers: {
         'Content-Type': 'application/json',
     },
     timeout: 10000, 
+    withCredentials: true, 
 });
 
-/* CONFIGURACIÓN PARA MANDAR TOKEN EN CADA PETICIÓN
+// Mandar token en cada petición
 apiClient.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('authToken'); 
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
+        // Lista de urls que no necesitan token
+        const publicEndpoints = [
+            '/auth/login',
+            '/auth/exchange-code',
+            '/user/register',
+            '/user/reset',
+            '/user/verify-code',
+            '/user/reset-password'
+        ];
+        
+        const isPublicEndpoint = publicEndpoints.some(endpoint => 
+            config.url?.includes(endpoint)
+        );
+        
+        // Solo agregar token si no es un endpoint público
+        if (!isPublicEndpoint) {
+            const token = localStorage.getItem('token'); 
+            if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
         }
+        
         return config;
     },
     (error) => {
         return Promise.reject(error);
     }
 );
-*/
 
 export default apiClient;

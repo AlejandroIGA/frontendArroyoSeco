@@ -10,7 +10,6 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-
     "cap:add:android": "cap add android",
     "cap:add:ios": "cap add ios",
     "cap:sync": "cap sync",
@@ -18,12 +17,10 @@
     "cap:open:ios": "cap open ios",
     "cap:run:android": "cap run android",
     "cap:run:ios": "cap run ios",
-
     "android:add": "cap add android",
     "android:open": "cap open android",
     "android:run": "cap run android",
     "android:build": "npm run build:mobile && cap open android",
-
     "deploy:web": "npm run build && firebase deploy --only hosting",
     "firebase:serve": "npm run build && firebase serve"
   },
