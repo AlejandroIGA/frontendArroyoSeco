@@ -12,7 +12,7 @@ import './Sidebar.css';
 
 const Sidebar = () => {
     const location = useLocation();
-    const userRole = localStorage.getItem('userRole');
+    const userRole = sessionStorage.getItem('userRole');
 
     const menuItems = [
         { title: 'Perfil', path: '/user-dashboard/profile', icon: personCircleOutline, id: 'perfil' },
@@ -25,13 +25,13 @@ const Sidebar = () => {
         await menuController.close();
     };
 
-    const handleLogOut = async () => {
-        await menuController.close();
-        localStorage.removeItem("isSessionActive");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("userRole");
+    const handleLogOut = () => {
+        sessionStorage.removeItem("isSessionActive");
         localStorage.removeItem("hasAcceptedTerms");
-        window.location.reload();
+        sessionStorage.removeItem("token")
+        sessionStorage.removeItem("refresh_token")
+        sessionStorage.removeItem("userRole")
+        window.location.href = 'https://alojando.duckdns.org/api/auth/logout';
     }
 
     return (

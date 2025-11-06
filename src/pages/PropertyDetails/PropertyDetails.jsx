@@ -33,6 +33,8 @@ import propertyService from "../../services/propertyService";
 import PropertyFormModal from "../Property/PropertyFormModal";
 
 const PropertyDetails = () => {
+    let userRole = sessionStorage.getItem('userRole');
+
     const { id } = useParams();
 
     const [property, setProperty] = useState(null);
@@ -258,7 +260,7 @@ const PropertyDetails = () => {
                                     </IonCard>
                                 </IonCol>
                                 {
-                                    localStorage.getItem("userRole") == "propietario" && property.ownerId == localStorage.getItem("userId")?
+                                    userRole == "propietario" && property.ownerId == localStorage.getItem("userId")?
                                         <IonCol>
                                             <IonButton expand="block" onClick={() => setIsModalOpen(true)}>
                                                 Editar
@@ -268,7 +270,7 @@ const PropertyDetails = () => {
                                             </IonButton>
                                         </IonCol>
                                         :
-                                    localStorage.getItem("userRole") == "visitante" ?  
+                                    userRole == "visitante" ?  
                                         <IonCol size="12" size-md="4">
                                             <ReservationForm
                                                 propertyId={property.id}
