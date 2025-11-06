@@ -260,7 +260,7 @@ const PropertyDetails = () => {
                                     </IonCard>
                                 </IonCol>
                                 {
-                                    userRole == "propietario" && property.isOwner?
+                                    userRole == "propietario" && property.owner?
                                         <IonCol>
                                             <IonButton expand="block" onClick={() => setIsModalOpen(true)}>
                                                 Editar
