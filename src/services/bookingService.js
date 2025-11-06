@@ -18,6 +18,10 @@ const bookingService = {
             params: searchParams
         });
         return response;
+    },
+     "getMyBookings": async () => {
+        const response = await apiClient.get('/bookings/me');
+        return response;
     }
 
 }
