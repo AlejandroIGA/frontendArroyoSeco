@@ -32,25 +32,12 @@ export default defineConfig({
         ]
       },
     workbox: {
+        // Esta opción asegura que tu index.html (el App Shell) se sirva para todas las rutas
+        // Es fundamental para Single-Page Applications (SPAs)
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/\/oauth2\//],
         // Reglas para el cacheo en tiempo de ejecución (runtime)
         runtimeCaching: [
-          {
-            // Regla para las peticiones a tu API
-            // Intercepta cualquier URL que contenga '/api/'
-            urlPattern: ({ url }) => url.pathname.includes('/api/'),
-            
-            // Estrategia: Primero intenta ir a la red. Si falla (estás offline),
-            // sirve la última versión guardada en caché.
-            handler: 'NetworkFirst',
-            
-            options: {
-              cacheName: 'api-cache', // Nombre del caché para las respuestas de la API
-              expiration: {
-                maxEntries: 50,       // Guarda un máximo de 50 peticiones
-                maxAgeSeconds: 60 * 60 * 24 // Guarda los datos por 1 día
-              }
-            }
-          },
           {
             // Regla para las imágenes
             // Intercepta peticiones que terminen en .png, .jpg, .jpeg, .svg, .gif
