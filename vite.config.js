@@ -32,10 +32,6 @@ export default defineConfig({
         ]
       },
     workbox: {
-        // Esta opción asegura que tu index.html (el App Shell) se sirva para todas las rutas
-        // Es fundamental para Single-Page Applications (SPAs)
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/\/oauth2\//],
         // Reglas para el cacheo en tiempo de ejecución (runtime)
         runtimeCaching: [
           {
