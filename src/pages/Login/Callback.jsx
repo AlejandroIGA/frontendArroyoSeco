@@ -23,7 +23,7 @@ const Callback = () => {
 
             if (userRole === 'VISITANTE') {
                 targetPath = '/user-dashboard/reservation';
-            } else if (userRole === 'ANFITRION') {
+            } else if (userRole === 'PROPIETARIO') {
                 targetPath = '/user-dashboard/property';
             } else {
                 console.warn(`Rol desconocido: ${userRole}. Redirigiendo a home.`);
