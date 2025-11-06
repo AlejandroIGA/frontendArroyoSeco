@@ -24,6 +24,7 @@ const Home = () => {
     const [presentToast] = useIonToast();
 
     let errorMsg = "";
+    let userRole = sessionStorage.getItem('userRole');
 
     const carouselImages = [
         '/img/arroyoSeco1.jpg',
@@ -66,7 +67,7 @@ const Home = () => {
             setShowTermsModal(true);
         }
 
-        if (localStorage.getItem('userRole') === "propietario") {
+        if (userRole === "propietario") {
             history.push("/user-dashboard/profile")
         }
 

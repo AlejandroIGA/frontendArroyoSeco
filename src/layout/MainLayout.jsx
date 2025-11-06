@@ -17,6 +17,7 @@ import {
 import { arrowBack } from 'ionicons/icons';
 import Sidebar from '../components/Sidebar/Sidebar';
 const MainLayout = ({ children, activePage }) => {
+  let userRole = sessionStorage.getItem('userRole')
   return (
     <>
       <IonMenu contentId="main-layout-content">
@@ -27,7 +28,7 @@ const MainLayout = ({ children, activePage }) => {
           <IonToolbar>
             <IonButtons slot="start">
               {
-                localStorage.getItem("userRole") != "visitante" ?
+                userRole != "visitante" ?
                   <IonText>Panel de administración</IonText>
                   :
                   <IonButton routerLink="/">

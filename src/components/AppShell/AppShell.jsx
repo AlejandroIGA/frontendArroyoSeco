@@ -12,6 +12,8 @@ import propertyService from "../../services/propertyService";
 import bookingService from "../../services/bookingService";
 const AppShell = ({ children, onSearchResults }) => {
 
+    let userRole = sessionStorage.getItem('userRole');
+
     const [searchCriteria, setSearchCriteria] = useState({
         guests: '',
         price: '',
@@ -90,6 +92,7 @@ const handleDateChange = (e, field) => {
         localStorage.removeItem("hasAcceptedTerms");
         sessionStorage.removeItem("token")
         sessionStorage.removeItem("refresh_token")
+        sessionStorage.removeItem("userRole")
         window.location.href = 'https://alojando.duckdns.org/api/auth/logout';
     }
 
@@ -100,7 +103,7 @@ const handleDateChange = (e, field) => {
                 <IonGrid >
                     <IonRow className="ion-align-items-center">
                         <IonCol size="2" class="ion-justify-content-end">
-                            <IonRouterLink routerLink={localStorage.getItem("userRole") !== "visitante" ? "/user-dashboard/property"  : "/" }>
+                            <IonRouterLink routerLink={userRole !== "visitante" ? "/user-dashboard/property"  : "/" }>
                                 <IonImg
                                     src="/logo.png"
                                     alt="Arroyo Seco"
@@ -110,7 +113,7 @@ const handleDateChange = (e, field) => {
                         </IonCol>
                         <IonCol className="ion-hide-lg-down">
                             {
-                                localStorage.getItem("userRole") == "propietario" ? 
+                                userRole == "propietario" ? 
                                 <></>
                                 :
                                 <SearchBar
@@ -213,7 +216,7 @@ const handleDateChange = (e, field) => {
                 <IonContent>
                     <IonList>
                         {
-                            localStorage.getItem("isSessionActive") ?
+                            sessionStorage.getItem("isSessionActive") ?
                                 <>
                                     <IonItem button={true} detail={false} routerLink="/user-dashboard/profile">
                                         <IonIcon slot="start" icon={personCircleOutline} />

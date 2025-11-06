@@ -16,6 +16,7 @@ const Callback = () => {
             sessionStorage.setItem('token', tokens.access_token);
             sessionStorage.setItem('refresh_token', tokens.refresh_token);
             sessionStorage.setItem('isSessionActive', true);
+            sessionStorage.setImte('userRole', tokens.user_role);
 
             const userRole = tokens.user_role;
             let targetPath = '/login'; 
