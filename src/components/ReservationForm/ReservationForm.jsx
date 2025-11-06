@@ -68,15 +68,8 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
   const handleBookingSubmit = async () => {
     setIsLoading(true);
     setError(null);
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      setError("No se pudo identificar al usuario. Por favor, inicie sesión.");
-      setIsLoading(false);
-      return;
-    }
     const bookingData = {
       propertyId: propertyId,
-      userId: userId,
       startDate: bookingDetails.startDate,
       endDate: bookingDetails.endDate,
       status: "Pendiente"

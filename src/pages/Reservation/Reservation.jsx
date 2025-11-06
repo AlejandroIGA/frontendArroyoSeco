@@ -39,21 +39,14 @@ const Reservaciones = () => {
 
   const loadData = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
-        const userId = localStorage.getItem("userId");
-        if (!userId) {
-          setError("No se pudo identificar al usuario. Por favor, inicie sesión de nuevo.");
-          setIsLoading(false);
-          return; 
-        }
-        const [bookingResponse, propertyResponse] = await Promise.all([
-          bookingService.searchBookings({ userId: userId }),
-          propertyService.getAll(),
-        ]);
+      setIsLoading(true);
+      setError(null);
+       const [bookingResponse, propertyResponse] = await Promise.all([
+        bookingService.getMyBookings(),
+        propertyService.getAll(),
+      ]);
 
         setAllReservations(bookingResponse.data || []);
-
         setAllProperties(propertyResponse.data || []);
         const propMap = new Map();
         (propertyResponse.data || []).forEach((prop) => {

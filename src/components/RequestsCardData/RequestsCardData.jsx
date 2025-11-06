@@ -17,24 +17,16 @@ const RequestsCardData = () => {
             try {
                 setIsLoading(true);
                 setError(null);
-                const ownerId = localStorage.getItem("userId");
-                if (!ownerId) {
-                    setError("No se pudo identificar al propietario. Por favor, inicie sesión.");
-                    setIsLoading(false);
-                    return;
-                }
                 const [bookingResponse, propertyResponse] = await Promise.all([
-                    bookingService.getAll(),
-                    propertyService.getAll()
+                    bookingService.getAll(), 
+                    propertyService.getMyProperties() 
                 ]);
                 const allBookings = bookingResponse.data || [];
-                const allProperties = propertyResponse.data || [];
+                const myProperties = propertyResponse.data || []; 
                 const myPropertyIds = new Set();
                 const propertyNameMap = new Map();
-                allProperties.forEach(prop => {
-                    if (String(prop.ownerId).trim() === ownerId.trim()) {
-                        myPropertyIds.add(prop.id);
-                    }
+                myProperties.forEach(prop => {
+                    myPropertyIds.add(prop.id);
                     propertyNameMap.set(prop.id, prop.name);
                 });
                 const myPropertyBookings = allBookings.filter(booking =>
