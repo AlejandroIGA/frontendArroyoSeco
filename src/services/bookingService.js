@@ -22,7 +22,8 @@ const bookingService = {
      "getMyBookings": async () => {
         const response = await apiClient.get('/bookings/me');
         return response;
-    }
+    },
+    
 
 }
 
