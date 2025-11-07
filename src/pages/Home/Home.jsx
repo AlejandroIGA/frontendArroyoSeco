@@ -48,7 +48,7 @@ const Home = () => {
                     errorMsg = "Error inesperado.";
                 }
             } else if (error.code === "ERR_NETWORK") {
-                errorMsg = `Error de conexión ${import.meta.env.VITE_API_URL}`;
+                errorMsg = `Error de conexión`;
             } else {
                 errorMsg = 'Ocurrió un error al cargar las propiedades.';
             }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import {
     IonPage,
     IonHeader,
@@ -79,19 +80,52 @@ const Login = () => {
             setIsLoading(true);
             try {
                 const response = await authService.login(formData); 
-                
-                if (response.status === 200) {
-                    // Redirigir al Authorization Server
-                    const authUrl = `${AUTHORIZE}?` + new URLSearchParams({
-                        response_type: 'code',
-                        client_id: CLIENT_ID,
-                        redirect_uri: REDIRECT_URI,
-                        scope: 'read write',
-                    });
+                const isNative = Capacitor.isNativePlatform();
+
+                if (isNative) {
+                    // --- FLUJO NATIVO ---
+                    // La app nativa usa el JSON de la respuesta directamente.
+                    const tokens = response.data;
                     
-                    setIsLoading(false);
-                    window.location.href = authUrl; 
-                    return;
+                    if (response.status === 200 && tokens.access_token) {
+                        // Copiamos la lógica de tu Callback.jsx
+                        sessionStorage.setItem('token', tokens.access_token);
+                        sessionStorage.setItem('refresh_token', tokens.refresh_token);
+                        sessionStorage.setItem('isSessionActive', true);
+                        sessionStorage.setItem('userRole', tokens.user_role.toLowerCase());
+
+                        const userRole = tokens.user_role;
+                        let targetPath = '/'; 
+                        if (userRole === 'VISITANTE') {
+                            targetPath = '/user-dashboard/reservation';
+                        } else if (userRole === 'PROPIETARIO') {
+                            targetPath = '/user-dashboard/property';
+                        }
+                        
+                        setIsLoading(false);
+                        history.replace(targetPath); // Redirige DENTRO de la app
+                        return;
+                    } else {
+                        // El login fue exitoso (status 200) pero no vinieron tokens
+                        throw new Error("Respuesta de login inválida para nativo.");
+                    }
+
+                } else {
+                    // --- FLUJO WEB ---
+                    // La app web ignora el JSON y usa el flujo de redirección
+                    // basado en la cookie que el backend acaba de establecer.
+                    if (response.status === 200) {
+                        const authUrl = `${AUTHORIZE}?` + new URLSearchParams({
+                            response_type: 'code',
+                            client_id: CLIENT_ID,
+                            redirect_uri: REDIRECT_URI, // Usa el URI de la web
+                            scope: 'read write',
+                        });
+                        
+                        setIsLoading(false);
+                        window.location.href = authUrl; // Redirige al navegador
+                        return;
+                    }
                 }
             } catch (error) {
                 setIsLoading(false);
