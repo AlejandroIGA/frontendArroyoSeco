@@ -7,24 +7,34 @@ export default defineConfig({
   plugins: [react(), VitePWA({ 
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Sistema de Reserva de Alojamientos Turísticos',
-        short_name: 'SRAT',
-        description: 'Aplicaci´oon que conecta propietarios con visitatntes para realizar reservaciones de alojamiento',
+        name: 'Alojando',
+        short_name: 'Alojando',
+        description: 'Aplicación que conecta propietarios con visitatntes para realizar reservaciones de alojamiento',
         theme_color: '#495de2ff', // Color de la barra de herramientas
         background_color: '#ec6b6bff', // Color de la pantalla de bienvenida (splash screen)
         icons: [
           {
-            src: 'pwa-192x192.png', // Ruta relativa a la carpeta 'public'
+            src: 'logo_x96.png',
+            sizes: '96x96',
+            type: 'image/png'
+          },
+          {
+            src: 'logo_x128.png',
+            sizes: '128x128',
+            type: 'image/png'
+          },
+          {
+            src: 'logo_x192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'logo_x512.png',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'logo_x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable' // Ícono adaptable para diferentes formas en Android

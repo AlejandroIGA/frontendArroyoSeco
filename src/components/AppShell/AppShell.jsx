@@ -111,9 +111,9 @@ const AppShell = ({ children, onSearchResults }) => {
                     <IonGrid >
                         <IonRow className="ion-align-items-center">
                             <IonCol size="2" class="ion-justify-content-end">
-                                <IonRouterLink routerLink={userRole !== "visitante" ? "/user-dashboard/property" : "/"}>
+                                <IonRouterLink routerLink={userRole == "propietario" ? "/user-dashboard/property" : "/"}>
                                     <IonImg
-                                        src="/logo.png"
+                                        src="/logo_x96.png"
                                         alt="Arroyo Seco"
                                         className="header-logo"
                                     />

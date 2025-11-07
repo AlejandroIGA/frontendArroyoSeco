@@ -33,7 +33,7 @@ apiClient.interceptors.request.use(
         );
         
         // Solo agregar token si no es un endpoint público
-        if (!isPublicEndpoint) {
+        if (!isPublicEndpoint && sessionStorage.getItem('isSessionActive')) {
             const token = sessionStorage.getItem('token'); 
             if (token) {
                 config.headers['Authorization'] = `Bearer ${token}`;
