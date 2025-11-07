@@ -97,6 +97,14 @@ const ReservationDetailsModal = ({ isOpen, onClose, reservation, property }) => 
                         </div>
                         <IonList lines="none">
                             <IonItem>
+                                <IonIcon icon={cashOutline} slot="start" color="primary" />
+                                <IonLabel>Monto Total</IonLabel>
+                                <IonNote slot="end" color="dark" style={{ fontSize: '1.1em', fontWeight: 'bold' }}>
+                                    ${reservation.totalPrice ? reservation.totalPrice.toFixed(2) : 'N/A'} MXN
+                                </IonNote>
+                            </IonItem>
+
+                            <IonItem>
                                 <IonIcon icon={statusDetails.icon} slot="start" color={statusDetails.color} />
                                 <IonLabel>Estado</IonLabel>
                                 <IonNote slot="end" color={statusDetails.color} className="status-badge">
