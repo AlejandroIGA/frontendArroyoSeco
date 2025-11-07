@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import {
     IonPage,
@@ -18,7 +18,6 @@ import {
     IonCol,
     IonRouterLink,
     IonLoading,
-    useIonToast,
     useIonViewWillEnter
 } from '@ionic/react';
 import { mailOutline, lockClosedOutline } from 'ionicons/icons';
@@ -83,47 +82,74 @@ const Login = () => {
                 const isNative = Capacitor.isNativePlatform();
 
                 if (isNative) {
-                    // --- FLUJO NATIVO ---
-                    // La app nativa usa el JSON de la respuesta directamente.
-                    const tokens = response.data;
-                    
-                    if (response.status === 200 && tokens.access_token) {
-                        // Copiamos la lógica de tu Callback.jsx
-                        sessionStorage.setItem('token', tokens.access_token);
-                        sessionStorage.setItem('refresh_token', tokens.refresh_token);
-                        sessionStorage.setItem('isSessionActive', true);
-                        sessionStorage.setItem('userRole', tokens.user_role.toLowerCase());
+                    // --- FLUJO MÓVIL CON OAUTH2 ---
+                    // Después del login exitoso, iniciamos el flujo OAuth móvil
+                    if (response.status === 200) {
+                        try {
+                            // Construir URL de autorización
+                            const authUrl = `${AUTHORIZE}?` + new URLSearchParams({
+                                response_type: 'code',
+                                client_id: CLIENT_ID,
+                                redirect_uri: REDIRECT_URI, // Ahora usa alojando://callback
+                                scope: 'read write',
+                            });
 
-                        const userRole = tokens.user_role;
-                        let targetPath = '/'; 
-                        if (userRole === 'VISITANTE') {
-                            targetPath = '/user-dashboard/reservation';
-                        } else if (userRole === 'PROPIETARIO') {
-                            targetPath = '/user-dashboard/property';
+                            // Importar dinámicamente el módulo de OAuth móvil
+                            const { mobileOAuth } = await import('../../utils/MobileOauth');
+                            
+                            setIsLoading(true);
+                            
+                            // Abrir navegador in-app y esperar el código
+                            const code = await mobileOAuth.startOAuthFlow(authUrl);
+                            
+                            // Intercambiar código por token
+                            const tokens = await authService.exchangeCode(code);
+                            
+                            // Guardar sesión
+                            sessionStorage.setItem('token', tokens.access_token);
+                            sessionStorage.setItem('refresh_token', tokens.refresh_token);
+                            sessionStorage.setItem('isSessionActive', true);
+                            sessionStorage.setItem('userRole', tokens.user_role.toLowerCase());
+                            
+                            // También guardar en localStorage para móvil
+                            localStorage.setItem('token', tokens.access_token);
+                            localStorage.setItem('refresh_token', tokens.refresh_token);
+                            localStorage.setItem('userRole', tokens.user_role.toLowerCase());
+
+                            const userRole = tokens.user_role;
+                            let targetPath = '/'; 
+                            
+                            if (userRole === 'VISITANTE') {
+                                targetPath = '/user-dashboard/reservation';
+                            } else if (userRole === 'PROPIETARIO') {
+                                targetPath = '/user-dashboard/property';
+                            }
+                            
+                            setIsLoading(false);
+                            history.replace(targetPath);
+                            
+                        } catch (oauthError) {
+                            console.error('Error en flujo OAuth móvil:', oauthError);
+                            setIsLoading(false);
+                            setErrors(prev => ({ 
+                                ...prev, 
+                                api: 'Error en la autenticación OAuth. Por favor, intenta de nuevo.' 
+                            }));
                         }
-                        
-                        setIsLoading(false);
-                        history.replace(targetPath); // Redirige DENTRO de la app
-                        return;
-                    } else {
-                        // El login fue exitoso (status 200) pero no vinieron tokens
-                        throw new Error("Respuesta de login inválida para nativo.");
                     }
 
                 } else {
-                    // --- FLUJO WEB ---
-                    // La app web ignora el JSON y usa el flujo de redirección
-                    // basado en la cookie que el backend acaba de establecer.
+                    // --- FLUJO WEB (sin cambios) ---
                     if (response.status === 200) {
                         const authUrl = `${AUTHORIZE}?` + new URLSearchParams({
                             response_type: 'code',
                             client_id: CLIENT_ID,
-                            redirect_uri: REDIRECT_URI, // Usa el URI de la web
+                            redirect_uri: REDIRECT_URI, // https://alojando.duckdns.org/callback
                             scope: 'read write',
                         });
                         
                         setIsLoading(false);
-                        window.location.href = authUrl; // Redirige al navegador
+                        window.location.href = authUrl;
                         return;
                     }
                 }
