@@ -72,7 +72,6 @@ const PropertyDetails = () => {
                 color: 'danger',
                 position: 'top'
             });
-            history.push('/user-dashboard/property');
         } finally {
             setIsLoading(false);
         }
