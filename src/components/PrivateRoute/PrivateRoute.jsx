@@ -3,8 +3,7 @@ import { Route, Redirect } from 'react-router-dom';
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
   const isAuthenticated = () => {
-    const token = localStorage.getItem('token');
-    console.log('🔐 PrivateRoute - Token:', token ? 'Existe' : 'No existe');
+    const token = sessionStorage.getItem('access_token');
     return !!token;
   };
 

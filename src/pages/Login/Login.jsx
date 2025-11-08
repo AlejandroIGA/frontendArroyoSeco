@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
     IonPage,
     IonHeader,
@@ -17,14 +17,12 @@ import {
     IonCol,
     IonRouterLink,
     IonLoading,
-    useIonToast,
     useIonViewWillEnter
 } from '@ionic/react';
 import { mailOutline, lockClosedOutline } from 'ionicons/icons';
 import './Login.css';
 import authService from '../../services/authService';
 import { useHistory } from 'react-router-dom';
-import { AUTHORIZE, CLIENT_ID, REDIRECT_URI } from '../../../axiosConfig'; 
 
 const Login = () => {
     const history = useHistory();
@@ -81,16 +79,16 @@ const Login = () => {
                 const response = await authService.login(formData); 
                 
                 if (response.status === 200) {
-                    // Redirigir al Authorization Server
-                    const authUrl = `${AUTHORIZE}?` + new URLSearchParams({
-                        response_type: 'code',
-                        client_id: CLIENT_ID,
-                        redirect_uri: REDIRECT_URI,
-                        scope: 'read write',
-                    });
-                    
                     setIsLoading(false);
-                    window.location.href = authUrl; 
+                    
+                    const userRole = response.data.authorities?.[0]?.authority;
+                    if (userRole === 'VISITANTE') {
+                        history.push('/user-dashboard/reservation');
+                    } else if (userRole === 'PROPIETARIO') {
+                        history.push('/user-dashboard/property');
+                    } else {
+                        history.push('/home');
+                    }
                     return;
                 }
             } catch (error) {
@@ -99,7 +97,7 @@ const Login = () => {
                     if (error.response.status === 401) {
                         setErrors(prev => ({ ...prev, api: 'Credenciales inválidas.' }));
                     } else {
-                        setErrors(prev => ({ ...prev, api: error.response.data.message || 'Error de autenticación.' }));
+                        setErrors(prev => ({ ...prev, api: error.response.data.error || 'Error de autenticación.' }));
                     }
                 } else if (error.code === "ERR_NETWORK") {
                     setErrors(prev => ({ ...prev, api: 'Error de conexión.' }));
