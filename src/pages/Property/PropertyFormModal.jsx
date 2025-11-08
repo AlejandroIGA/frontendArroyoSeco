@@ -23,40 +23,45 @@ import {
 } from '@ionic/react';
 import { cameraOutline, closeCircle } from 'ionicons/icons';
 
-// Define el número máximo de imágenes permitido
-const MAX_IMAGES = 5;
-
-// Valores iniciales (se mantiene igual)
-const initialFormData = {
-    name: '',
-    pricePerNight: 0.0,
-    type: '',
-    numberOfGuests: 1,
-    kidsAllowed: false,
-    petsAllowed: false,
-    showProperty: false,
-    location: {
-        calle: '',
-        colonia: '',
-        numero: '',
-        codigoPostal: ''
-    },
-    description: {
-        general: '',
-        internet: false,
-        camasIndividuales: 0,
-        camasMatrimoniales: 0,
-        lavado: false
-    },
-    imagen: [],
-};
 
 const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
+    // Define el número máximo de imágenes permitido
+    const MAX_IMAGES = 5;
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
+
+    // Valores iniciales (se mantiene igual)
+    const initialFormData = {
+        name: '',
+        pricePerNight: 0.0,
+        type: '',
+        numberOfGuests: 1,
+        kidsAllowed: false,
+        petsAllowed: false,
+        showProperty: false,
+        location: {
+            calle: '',
+            colonia: '',
+            numero: '',
+            codigoPostal: ''
+        },
+        description: {
+            general: '',
+            internet: false,
+            camasIndividuales: 0,
+            camasMatrimoniales: 0,
+            lavado: false
+        },
+        imagen: [],
+    };
+
     const [formData, setFormData] = useState(initialFormData);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const fileInputRef = useRef(null);
     const [showAlert, setShowAlert] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+
+    const [showSizeAlert, setShowSizeAlert] = useState(false);
+    const [oversizedFileNames, setOversizedFileNames] = useState([]);
 
     const parseMapValues = (mapObject) => {
         if (!mapObject) return {};
@@ -166,6 +171,43 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
     const handleFileSelect = (e) => {
         const files = Array.from(e.target.files);
 
+        // Validar tamaño de archivos
+        const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
+
+        if (oversizedFiles.length > 0) {
+            setOversizedFileNames(oversizedFiles.map(f => f.name));
+            setShowSizeAlert(true);
+
+            // Filtrar solo los archivos válidos
+            const validFiles = files.filter(file => file.size <= MAX_FILE_SIZE);
+
+            if (validFiles.length === 0) {
+                e.target.value = null;
+                return;
+            }
+
+            // Continuar solo con archivos válidos
+            const currentTotalImages = formData.imagen.length + selectedFiles.length;
+            const newTotal = currentTotalImages + validFiles.length;
+
+            if (newTotal > MAX_IMAGES) {
+                const filesToAdd = MAX_IMAGES - currentTotalImages;
+                if (filesToAdd > 0) {
+                    setSelectedFiles(prevFiles => [
+                        ...prevFiles,
+                        ...validFiles.slice(0, filesToAdd)
+                    ]);
+                }
+                setShowAlert(true);
+            } else {
+                setSelectedFiles(prevFiles => [...prevFiles, ...validFiles]);
+            }
+
+            e.target.value = null;
+            return;
+        }
+
+        // Código original para validar cantidad de imágenes
         const currentTotalImages = formData.imagen.length + selectedFiles.length;
         const newTotal = currentTotalImages + files.length;
 
@@ -229,6 +271,7 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
 
         const dataToSave = {
             ...formData,
+            pricePerNight: parseFloat(parseFloat(formData.pricePerNight).toFixed(2)),
             location: stringifyMapValues(formData.location),
             description: stringifyMapValues(formData.description),
             imagen: finalImageUrls,
@@ -284,8 +327,6 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                                         name="pricePerNight"
                                         value={formData.pricePerNight}
                                         onIonChange={handleChange}
-                                        min="0.01"
-                                        step="0.01"
                                         required
                                     />
                                 </IonItem>
@@ -331,8 +372,9 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
                         <IonRow>
                             <IonCol size="12">
                                 <p className="ion-no-margin">
-                                    {/* NEGRITAS APLICADAS AQUÍ */}
                                     Sube <strong>entre 1 y {MAX_IMAGES} fotos</strong> para tu propiedad.
+                                    <br />
+                                    <small>Tamaño máximo por imagen: 5MB</small>
                                 </p>
                                 <p className="ion-text-end ion-margin-top">
                                     {/* NEGRITAS APLICADAS AQUÍ */}
@@ -597,10 +639,10 @@ const PropertyFormModal = ({ isOpen, onClose, onSave, propertyData }) => {
 
             {/* Alerta de Límite de Fotos */}
             <IonAlert
-                isOpen={showAlert}
-                onDidDismiss={() => setShowAlert(false)}
-                header={'Límite de Fotos Alcanzado'}
-                message={`Solo puedes subir un máximo de ${MAX_IMAGES} fotos por propiedad.`}
+                isOpen={showSizeAlert}
+                onDidDismiss={() => setShowSizeAlert(false)}
+                header={'Archivos Demasiado Grandes'}
+                message={`Las siguientes imágenes exceden el tamaño máximo de 5MB: ${oversizedFileNames.join(', ')}`}
                 buttons={['OK']}
             />
         </IonModal>

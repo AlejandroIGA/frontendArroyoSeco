@@ -75,6 +75,9 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
       status: "Pendiente"
     };
     try {
+      if (!sessionStorage.get("token")) {
+        setError("Debe iniciar sesión")
+      }
       await bookingService.registerBooking(bookingData);
       setToastMessage("¡Reserva solicitada con éxito! Recibirás una confirmación.");
       setTimeout(() => {
@@ -97,12 +100,20 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
           <IonList lines="full" className="ion-no-padding ion-margin-bottom">
             <IonItem button detail={false} className="date-input-group" onClick={() => setShowStartDateModal(true)}>
               <IonLabel position="stacked">Llegada</IonLabel>
-              <IonText slot="end" className="widget-date-text">{formatForDisplay(bookingDetails.startDate)}</IonText>
+              <IonInput
+                readonly
+                value={formatForDisplay(bookingDetails.startDate)}
+                className="widget-date-input"
+              />
             </IonItem>
 
             <IonItem button detail={false} className="date-input-group ion-margin-top" onClick={() => setShowEndDateModal(true)}>
               <IonLabel position="stacked">Salida</IonLabel>
-              <IonText slot="end" className="widget-date-text">{formatForDisplay(bookingDetails.endDate)}</IonText>
+              <IonInput
+                readonly
+                value={formatForDisplay(bookingDetails.endDate)}
+                className="widget-date-input"
+              />
             </IonItem>
           </IonList>
 

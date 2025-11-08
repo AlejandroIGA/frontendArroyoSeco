@@ -15,7 +15,9 @@ import {
     IonCard,
     IonCardContent,
     useIonToast,
-    IonLoading
+    IonLoading,
+    IonHeader,
+    IonBackButton
 } from '@ionic/react';
 
 import { peopleOutline, pawOutline, accessibilityOutline, checkmarkCircleOutline, closeCircleOutline, homeOutline } from 'ionicons/icons';
@@ -85,10 +87,10 @@ const PropertyDetails = () => {
         setIsSaving(true);
         try {
             await propertyService.update(id, dataToSave);
-            
+
             setIsModalOpen(false);
-            
-            await findPropertyById(id); 
+
+            await findPropertyById(id);
 
             presentToast({
                 message: 'Propiedad actualizada con éxito.',
@@ -111,25 +113,31 @@ const PropertyDetails = () => {
 
     const deleteProperty = async (id) => {
         setIsLoading(true);
-        try{
+        try {
             await propertyService.delete(id);
             setIsModalOpen(false);
             history.push('/user-dashboard/property');
-        }catch(error){
+        } catch (error) {
             presentToast({
                 message: 'Error al actualizar la propiedad.',
                 duration: 3000,
                 color: 'danger',
                 position: 'top'
             });
-        }finally {
+        } finally {
             setIsSaving(false);
         }
-    }  
+    }
 
     return (
         <IonPage>
             <AppShell>
+                <IonHeader>
+                    <IonBackButton
+                        defaultHref="/"
+                        text="Regresar"
+                    />
+                </IonHeader>
                 {
                     isLoading == true ?
                         <p>Cargando propiedades</p>
@@ -259,7 +267,7 @@ const PropertyDetails = () => {
                                     </IonCard>
                                 </IonCol>
                                 {
-                                    userRole == "propietario" && property.owner?
+                                    userRole == "propietario" && property.owner ?
                                         <IonCol>
                                             <IonButton expand="block" onClick={() => setIsModalOpen(true)}>
                                                 Editar
@@ -282,13 +290,13 @@ const PropertyDetails = () => {
                         </IonGrid>
                 }
                 {property && (
-                <PropertyFormModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={handleEditSave}
-                    propertyData={property}
-                />
-            )}
+                    <PropertyFormModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onSave={handleEditSave}
+                        propertyData={property}
+                    />
+                )}
             </AppShell>
             <IonLoading
                 isOpen={isSaving}
