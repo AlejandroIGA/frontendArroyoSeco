@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   IonCard, IonCardContent, IonList, IonItem, IonLabel,
-  IonText, IonButton, IonModal, IonDatetime, IonSpinner, IonToast
+  IonText, IonButton, IonModal, IonDatetime, IonSpinner, IonToast,
+  IonInput
 } from '@ionic/react';
 
 import bookingService from '../../services/bookingService';
