@@ -3,8 +3,7 @@
   "appName": "reservaciones",
   "webDir": "dist",
   "server": {
-    "androidScheme": "https",
-    "cleartext": true
+    "androidScheme": "https"
   },
   "plugins": {
     "SplashScreen": {
@@ -16,9 +15,6 @@
       "style": "light",
       "backgroundColor": "#ffffff",
       "overlaysWebView": false
-    },
-    "App": {
-      "appUrlScheme": "alojando"
     }
   }
 }

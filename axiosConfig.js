@@ -1,25 +1,18 @@
 import axios from 'axios';
-import { Capacitor } from '@capacitor/core';
 
 export const CLIENT_ID = 'srta';
-
-// Detectar si estamos en móvil o web
-const isNativePlatform = Capacitor.isNativePlatform();
-
-// URLs diferentes según la plataforma
-export const REDIRECT_URI = isNativePlatform 
-  ? 'alojando://callback'  // Deep link para móvil
-  : 'https://alojando.duckdns.org/callback';  // URL web
-
+export const REDIRECT_URI = 'https://alojando.duckdns.org/callback';
 export const AUTHORIZE = 'https://alojando.duckdns.org/oauth2/authorize'; 
 
+
 const apiClient = axios.create({
+    // baseURL: 'http://localhost:8080/api',
     baseURL: 'https://alojando.duckdns.org/api',
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 10000, 
-    withCredentials: !isNativePlatform, // Solo en web
+    timeout: 25000, 
+    withCredentials: true, 
 });
 
 // Mandar token en cada petición
