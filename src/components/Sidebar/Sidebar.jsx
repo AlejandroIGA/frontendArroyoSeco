@@ -13,7 +13,6 @@ import './Sidebar.css';
 const Sidebar = () => {
     const location = useLocation();
     const userRole = sessionStorage.getItem('userRole');
-
     const menuItems = [
         { title: 'Perfil', path: '/user-dashboard/profile', icon: personCircleOutline, id: 'perfil' },
         { title: 'Propiedades', path: '/user-dashboard/property', icon: homeOutline, id: 'propiedades' },
@@ -44,10 +43,10 @@ const Sidebar = () => {
         <div className="sidebar-container">
             <IonList lines="none">
                 {menuItems.map((item, index) => {
-                    if (item.id === 'reservaciones' && userRole === 'propietario') {
+                    if (item.id === 'reservaciones' && userRole == 'propietario') {
                         return null;
                     }
-                    if (item.id === 'propiedades' && userRole === 'visitante') {
+                    if (item.id === 'propiedades' && userRole == 'visitante') {
                         return null;
                     }
                     return (

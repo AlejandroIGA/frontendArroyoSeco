@@ -3,8 +3,10 @@ import { Route, Redirect } from 'react-router-dom';
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
   const isAuthenticated = () => {
-    const token = sessionStorage.getItem('access_token');
-    return !!token;
+    const session = sessionStorage.getItem('isSessionActive');
+    console.log("llego aquí private ", session );
+
+    return session;
   };
 
   return (

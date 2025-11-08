@@ -67,7 +67,8 @@ const Home = () => {
             setShowTermsModal(true);
         }
 
-        if (userRole === "propietario") {
+        if (userRole == "propietario") {
+            console.log(userRole == "propietario")
             history.push("/user-dashboard/profile")
         }
 

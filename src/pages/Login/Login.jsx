@@ -77,17 +77,23 @@ const Login = () => {
             setIsLoading(true);
             try {
                 const response = await authService.login(formData); 
-                
                 if (response.status === 200) {
                     setIsLoading(false);
                     
                     const userRole = response.data.authorities?.[0]?.authority;
-                    if (userRole === 'VISITANTE') {
+                    sessionStorage.setItem('token',response.data.token);
+                    sessionStorage.setItem('userRole', userRole.toLowerCase());
+                    sessionStorage.setItem('isSessionActive', true);
+
+                    console.log(response);
+                    console.log(sessionStorage.getItem('token'));
+
+                    if (userRole == 'VISITANTE') {
                         history.push('/user-dashboard/reservation');
-                    } else if (userRole === 'PROPIETARIO') {
+                    } else if (userRole == 'PROPIETARIO') {
                         history.push('/user-dashboard/property');
                     } else {
-                        history.push('/home');
+                        history.push('/');
                     }
                     return;
                 }

@@ -20,7 +20,6 @@ apiClient.interceptors.request.use(
             '/user/reset',
             '/user/verify-code',
             '/user/reset-password',
-            '/properties'
         ];
         
         // Verificar si la URL actual es un endpoint público
@@ -29,7 +28,7 @@ apiClient.interceptors.request.use(
         );
         // Solo agregar token si NO es un endpoint público
         if (!isPublicEndpoint) {
-            const token = sessionStorage.getItem('access_token'); 
+            const token = sessionStorage.getItem('token'); 
             if (token) {
                 config.headers['Authorization'] = `Bearer ${token}`;
             }
@@ -48,8 +47,9 @@ apiClient.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             // Token expirado o inválido
-            sessionStorage.removeItem('access_token');
-            
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem("isSessionActive");
+            sessionStorage.removeItem("userRole")
             // Redirigir al login si no estamos ya ahí
             if (!window.location.pathname.includes('/login')) {
                 window.location.href = '/login';

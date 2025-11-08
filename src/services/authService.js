@@ -4,12 +4,6 @@ const authService = {
     "login": async (credentials) => {
         try {
             const response = await apiClient.post('/auth/login', credentials);
-            
-            // Solo guardar el token en sessionStorage
-            if (response.data.token) {
-                sessionStorage.setItem('access_token', response.data.token);
-            }
-            
             return response;
         } catch (error) {
             throw error;
@@ -17,15 +11,15 @@ const authService = {
     },
 
     "logout": () => {
-        sessionStorage.removeItem('access_token');
+        sessionStorage.removeItem('token');
     },
 
     "isAuthenticated": () => {
-        return !!sessionStorage.getItem('access_token');
+        return !!sessionStorage.getItem('token');
     },
 
     "getToken": () => {
-        return sessionStorage.getItem('access_token');
+        return sessionStorage.getItem('token');
     },
 
     "register": async (data) => {
