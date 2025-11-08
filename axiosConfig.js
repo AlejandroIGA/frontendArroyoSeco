@@ -1,10 +1,5 @@
 import axios from 'axios';
 
-export const CLIENT_ID = 'srta';
-export const REDIRECT_URI = 'https://alojando.duckdns.org/callback';
-export const AUTHORIZE = 'https://alojando.duckdns.org/oauth2/authorize'; 
-
-
 const apiClient = axios.create({
     // baseURL: 'http://localhost:8080/api',
     baseURL: 'https://alojando.duckdns.org/api',
@@ -15,26 +10,26 @@ const apiClient = axios.create({
     withCredentials: true, 
 });
 
-// Mandar token en cada petición
+// Interceptor para agregar el token JWT a las peticiones
 apiClient.interceptors.request.use(
     (config) => {
-        // Lista de urls que no necesitan token
+        // Lista de URLs públicas que NO necesitan token
         const publicEndpoints = [
             '/auth/login',
-            '/auth/exchange-code',
             '/user/register',
             '/user/reset',
             '/user/verify-code',
-            '/user/reset-password'
+            '/user/reset-password',
+            '/properties'
         ];
         
+        // Verificar si la URL actual es un endpoint público
         const isPublicEndpoint = publicEndpoints.some(endpoint => 
             config.url?.includes(endpoint)
         );
-        
-        // Solo agregar token si no es un endpoint público
-        if (!isPublicEndpoint && sessionStorage.getItem('isSessionActive')) {
-            const token = sessionStorage.getItem('token'); 
+        // Solo agregar token si NO es un endpoint público
+        if (!isPublicEndpoint) {
+            const token = sessionStorage.getItem('access_token'); 
             if (token) {
                 config.headers['Authorization'] = `Bearer ${token}`;
             }
@@ -43,6 +38,23 @@ apiClient.interceptors.request.use(
         return config;
     },
     (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// Interceptor para manejar errores de autenticación
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Token expirado o inválido
+            sessionStorage.removeItem('access_token');
+            
+            // Redirigir al login si no estamos ya ahí
+            if (!window.location.pathname.includes('/login')) {
+                window.location.href = '/login';
+            }
+        }
         return Promise.reject(error);
     }
 );
