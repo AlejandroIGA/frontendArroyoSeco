@@ -17,7 +17,9 @@ import {
     useIonToast,
     IonLoading,
     IonHeader,
-    IonBackButton
+    IonBackButton,
+    IonToolbar,
+    IonButtons
 } from '@ionic/react';
 
 import { peopleOutline, pawOutline, accessibilityOutline, checkmarkCircleOutline, closeCircleOutline, homeOutline } from 'ionicons/icons';
@@ -133,10 +135,15 @@ const PropertyDetails = () => {
         <IonPage>
             <AppShell>
                 <IonHeader>
-                    <IonBackButton
-                        defaultHref="/"
-                        text="Regresar"
-                    />
+                    <IonToolbar>
+                        <IonButtons slot="start">
+                            <IonBackButton
+                                defaultHref="/"
+                                text="Regresar"
+                                style={{ color: '#c6402e' }}
+                            />
+                        </IonButtons>
+                    </IonToolbar>
                 </IonHeader>
                 {
                     isLoading == true ?

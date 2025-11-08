@@ -76,8 +76,9 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
       status: "Pendiente"
     };
     try {
-      if (!sessionStorage.get("token")) {
+      if (!sessionStorage.getItem("token")) {
         setError("Debe iniciar sesión")
+        return;
       }
       await bookingService.registerBooking(bookingData);
       setToastMessage("¡Reserva solicitada con éxito! Recibirás una confirmación.");
