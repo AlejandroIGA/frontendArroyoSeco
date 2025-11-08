@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   IonCard, IonCardContent, IonList, IonItem, IonLabel,
-  IonText, IonButton, IonModal, IonDatetime, IonSpinner, IonToast
+  IonText, IonButton, IonModal, IonDatetime, IonSpinner, IonToast,
+  IonInput
 } from '@ionic/react';
 
 import bookingService from '../../services/bookingService';
@@ -68,20 +69,17 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
   const handleBookingSubmit = async () => {
     setIsLoading(true);
     setError(null);
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      setError("No se pudo identificar al usuario. Por favor, inicie sesión.");
-      setIsLoading(false);
-      return;
-    }
     const bookingData = {
       propertyId: propertyId,
-      userId: userId,
       startDate: bookingDetails.startDate,
       endDate: bookingDetails.endDate,
       status: "Pendiente"
     };
     try {
+      if (!sessionStorage.getItem("token")) {
+        setError("Debe iniciar sesión")
+        return;
+      }
       await bookingService.registerBooking(bookingData);
       setToastMessage("¡Reserva solicitada con éxito! Recibirás una confirmación.");
       setTimeout(() => {
@@ -104,12 +102,20 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
           <IonList lines="full" className="ion-no-padding ion-margin-bottom">
             <IonItem button detail={false} className="date-input-group" onClick={() => setShowStartDateModal(true)}>
               <IonLabel position="stacked">Llegada</IonLabel>
-              <IonText slot="end" className="widget-date-text">{formatForDisplay(bookingDetails.startDate)}</IonText>
+              <IonInput
+                readonly
+                value={formatForDisplay(bookingDetails.startDate)}
+                className="widget-date-input"
+              />
             </IonItem>
 
             <IonItem button detail={false} className="date-input-group ion-margin-top" onClick={() => setShowEndDateModal(true)}>
               <IonLabel position="stacked">Salida</IonLabel>
-              <IonText slot="end" className="widget-date-text">{formatForDisplay(bookingDetails.endDate)}</IonText>
+              <IonInput
+                readonly
+                value={formatForDisplay(bookingDetails.endDate)}
+                className="widget-date-input"
+              />
             </IonItem>
           </IonList>
 

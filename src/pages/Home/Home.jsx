@@ -24,6 +24,7 @@ const Home = () => {
     const [presentToast] = useIonToast();
 
     let errorMsg = "";
+    let userRole = sessionStorage.getItem('userRole');
 
     const carouselImages = [
         '/img/arroyoSeco1.jpg',
@@ -47,7 +48,7 @@ const Home = () => {
                     errorMsg = "Error inesperado.";
                 }
             } else if (error.code === "ERR_NETWORK") {
-                errorMsg = `Error de conexión ${import.meta.env.VITE_API_URL}`;
+                errorMsg = `Error de conexión`;
             } else {
                 errorMsg = 'Ocurrió un error al cargar las propiedades.';
             }
@@ -66,7 +67,7 @@ const Home = () => {
             setShowTermsModal(true);
         }
 
-        if (localStorage.getItem('userRole') === "propietario") {
+        if (userRole === "propietario") {
             history.push("/user-dashboard/profile")
         }
 

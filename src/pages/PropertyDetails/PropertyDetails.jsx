@@ -15,7 +15,11 @@ import {
     IonCard,
     IonCardContent,
     useIonToast,
-    IonLoading
+    IonLoading,
+    IonHeader,
+    IonBackButton,
+    IonToolbar,
+    IonButtons
 } from '@ionic/react';
 
 import { peopleOutline, pawOutline, accessibilityOutline, checkmarkCircleOutline, closeCircleOutline, homeOutline } from 'ionicons/icons';
@@ -33,6 +37,8 @@ import propertyService from "../../services/propertyService";
 import PropertyFormModal from "../Property/PropertyFormModal";
 
 const PropertyDetails = () => {
+    let userRole = sessionStorage.getItem('userRole');
+
     const { id } = useParams();
 
     const [property, setProperty] = useState(null);
@@ -70,7 +76,6 @@ const PropertyDetails = () => {
                 color: 'danger',
                 position: 'top'
             });
-            history.push('/user-dashboard/property');
         } finally {
             setIsLoading(false);
         }
@@ -84,10 +89,10 @@ const PropertyDetails = () => {
         setIsSaving(true);
         try {
             await propertyService.update(id, dataToSave);
-            
+
             setIsModalOpen(false);
-            
-            await findPropertyById(id); 
+
+            await findPropertyById(id);
 
             presentToast({
                 message: 'Propiedad actualizada con éxito.',
@@ -110,25 +115,36 @@ const PropertyDetails = () => {
 
     const deleteProperty = async (id) => {
         setIsLoading(true);
-        try{
+        try {
             await propertyService.delete(id);
             setIsModalOpen(false);
             history.push('/user-dashboard/property');
-        }catch(error){
+        } catch (error) {
             presentToast({
                 message: 'Error al actualizar la propiedad.',
                 duration: 3000,
                 color: 'danger',
                 position: 'top'
             });
-        }finally {
+        } finally {
             setIsSaving(false);
         }
-    }  
+    }
 
     return (
         <IonPage>
             <AppShell>
+                <IonHeader>
+                    <IonToolbar>
+                        <IonButtons slot="start">
+                            <IonBackButton
+                                defaultHref="/"
+                                text="Regresar"
+                                style={{ color: '#c6402e' }}
+                            />
+                        </IonButtons>
+                    </IonToolbar>
+                </IonHeader>
                 {
                     isLoading == true ?
                         <p>Cargando propiedades</p>
@@ -258,7 +274,7 @@ const PropertyDetails = () => {
                                     </IonCard>
                                 </IonCol>
                                 {
-                                    localStorage.getItem("userRole") == "propietario" && property.ownerId == localStorage.getItem("userId")?
+                                    userRole == "propietario" && property.owner ?
                                         <IonCol>
                                             <IonButton expand="block" onClick={() => setIsModalOpen(true)}>
                                                 Editar
@@ -268,15 +284,12 @@ const PropertyDetails = () => {
                                             </IonButton>
                                         </IonCol>
                                         :
-                                    localStorage.getItem("userRole") == "visitante" ?  
                                         <IonCol size="12" size-md="4">
                                             <ReservationForm
                                                 propertyId={property.id}
                                                 pricePerNight={parseFloat(property.pricePerNight)}
                                             />
                                         </IonCol>
-                                        :
-                                        <></>
                                 }
 
                             </IonRow>
@@ -284,13 +297,13 @@ const PropertyDetails = () => {
                         </IonGrid>
                 }
                 {property && (
-                <PropertyFormModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={handleEditSave}
-                    propertyData={property}
-                />
-            )}
+                    <PropertyFormModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onSave={handleEditSave}
+                        propertyData={property}
+                    />
+                )}
             </AppShell>
             <IonLoading
                 isOpen={isSaving}
