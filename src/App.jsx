@@ -34,6 +34,7 @@ const UserProfile = React.lazy(() => import('./pages/UserProfile/UserProfile'));
 const ResetPassword = React.lazy(() => import('./pages/ResetPassword/ResetPassword'));
 const PrivacyPoliciy = React.lazy(() => import('./pages/Legal/PrivacyPolicy'));
 const Terms = React.lazy(() => import('./pages/Legal/Terms'));
+const DeleteAccount = React.lazy(()=> import('./pages/DeleteAccount/DeleteAccount'));
 
 
 setupIonicReact();
@@ -58,6 +59,7 @@ function App() {
           <PrivateRoute path="/user-dashboard/reservation" exact component={Reservation}/>
           <PrivateRoute path="/user-dashboard/property" exact component={Property}/>
           <PrivateRoute path="/user-dashboard/profile" exact component={UserProfile}/>
+          <PrivateRoute path="/DeleteMyInfo" exact component={DeleteAccount}/>
                     
         </IonRouterOutlet>
         </Suspense>

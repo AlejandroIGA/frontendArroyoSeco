@@ -63,6 +63,14 @@ const authService = {
         } catch (error) {
             throw error.response.data.message;
         }
+    },
+    "delete" : async () => {
+         try {
+            const response = await apiClient.delete(`/user/delete`); 
+            return response;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

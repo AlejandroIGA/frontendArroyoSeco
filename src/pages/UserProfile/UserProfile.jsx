@@ -165,6 +165,9 @@ const UserProfile = () => {
                                     <IonButton fill="outline" routerLink="/reset-password" className="ion-margin-top ion-margin-start">
                                         Cambiar Contraseña
                                     </IonButton>
+                                    <IonButton fill="outline" routerLink="/DeleteMyInfo" className="ion-margin-top ion-margin-start">
+                                        Eliminar Cuenta
+                                    </IonButton>
                                 </div>
                             </div>
                         </IonCol>
