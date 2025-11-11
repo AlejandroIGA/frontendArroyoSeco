@@ -19,7 +19,7 @@ import {
     IonLoading,
     useIonViewWillEnter
 } from '@ionic/react';
-import { mailOutline, lockClosedOutline } from 'ionicons/icons';
+import { mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import './Login.css';
 import authService from '../../services/authService';
 import { useHistory } from 'react-router-dom';
@@ -27,6 +27,7 @@ import { useHistory } from 'react-router-dom';
 const Login = () => {
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -36,8 +37,12 @@ const Login = () => {
     const [errors, setErrors] = useState({
         email: '',
         password: '',
-        api: '' 
+        api: ''
     });
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -62,7 +67,7 @@ const Login = () => {
         if (!formData.password) {
             newErrors.password = 'La contraseña es obligatoria.';
             isValid = false;
-        } else if (formData.password.length < 4) { 
+        } else if (formData.password.length < 4) {
             newErrors.password = 'La contraseña debe tener al menos 4 caracteres.';
             isValid = false;
         }
@@ -76,12 +81,12 @@ const Login = () => {
         if (validateForm()) {
             setIsLoading(true);
             try {
-                const response = await authService.login(formData); 
+                const response = await authService.login(formData);
                 if (response.status === 200) {
                     setIsLoading(false);
-                    
+
                     const userRole = response.data.authorities?.[0]?.authority;
-                    sessionStorage.setItem('token',response.data.token);
+                    sessionStorage.setItem('token', response.data.token);
                     sessionStorage.setItem('userRole', userRole.toLowerCase());
                     sessionStorage.setItem('isSessionActive', true);
 
@@ -155,9 +160,15 @@ const Login = () => {
                                             label="Contraseña"
                                             labelPlacement='floating'
                                             name="password"
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             value={formData.password}
                                             onIonInput={handleInputChange}
+                                        />
+                                        <IonIcon
+                                            slot="end"
+                                            icon={showPassword ? eyeOffOutline : eyeOutline}
+                                            onClick={togglePasswordVisibility}
+                                            style={{ cursor: 'pointer', fontSize: '24px' }}
                                         />
                                     </IonItem>
                                     {errors.password && <p className="error-message">{errors.password}</p>}

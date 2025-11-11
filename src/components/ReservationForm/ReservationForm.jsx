@@ -125,7 +125,22 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
               <span style={{ fontWeight: 700, float: 'right' }}>${totalPrice}</span>
             </p>
           </IonText>
-          {error && <IonText color="danger" className="ion-text-center"><p>{error}</p></IonText>}
+          {error && (
+            <IonText color="danger" className="ion-text-center">
+              <p>
+                {error === "Debe iniciar sesión" ? (
+                  <span
+                    onClick={() => history.push('/login')}
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    {error}
+                  </span>
+                ) : (
+                  error
+                )}
+              </p>
+            </IonText>
+          )}
           <IonButton
             color="primary"
             expand="block"

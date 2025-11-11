@@ -6,9 +6,9 @@ import {
     IonRouterLink,
     IonLoading, useIonToast, IonSelect, IonSelectOption,
     useIonViewWillEnter,
-    IonLabel
+    IonLabel, IonNote
 } from '@ionic/react';
-import { personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline, briefcaseOutline } from 'ionicons/icons';
+import { informationCircleOutline, eyeOutline, eyeOffOutline, personOutline, callOutline, earthOutline, mailOutline, lockClosedOutline, briefcaseOutline } from 'ionicons/icons';
 import './Register.css'; // Usaremos un CSS idéntico al del login
 import authService from '../../services/authService';
 
@@ -18,6 +18,11 @@ const RegisterPage = () => {
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
     const [presentToast] = useIonToast();
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     // 1. Expandimos el estado para los nuevos campos
     const [formData, setFormData] = useState({
@@ -210,8 +215,37 @@ const RegisterPage = () => {
 
                                     <IonItem>
                                         <IonIcon icon={lockClosedOutline} slot="start" />
-                                        <IonInput label="Contraseña" labelPlacement="floating" name="password" type="password" value={formData.password} onIonInput={handleInputChange} />
+                                        <IonInput label="Contraseña" labelPlacement="floating" name="password" type={showPassword ? "text" : "password"} value={formData.password} onIonInput={handleInputChange} />
+                                        <IonIcon
+                                            slot="end"
+                                            icon={showPassword ? eyeOffOutline : eyeOutline}
+                                            onClick={togglePasswordVisibility}
+                                            style={{ cursor: 'pointer', fontSize: '24px' }}
+                                        />
                                     </IonItem>
+                                    <div className="password-requirements">
+                                        <IonNote color="medium">
+                                            <IonIcon icon={informationCircleOutline} style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: '4px' }} />
+                                            La contraseña debe contener:
+                                        </IonNote>
+                                        <ul className="requirements-list">
+                                            <li>
+                                                <IonNote color="medium">Mínimo 12 caracteres</IonNote>
+                                            </li>
+                                            <li>
+                                                <IonNote color="medium">Al menos una mayúscula (A-Z)</IonNote>
+                                            </li>
+                                            <li>
+                                                <IonNote color="medium">Al menos una minúscula (a-z)</IonNote>
+                                            </li>
+                                            <li>
+                                                <IonNote color="medium">Al menos un número (0-9)</IonNote>
+                                            </li>
+                                            <li>
+                                                <IonNote color="medium">Un carácter especial (@$!%*?&)</IonNote>
+                                            </li>
+                                        </ul>
+                                    </div>
                                     {errors.password && <p className="error-message">{errors.password}</p>}
                                 </IonList>
                                 <IonItem>
