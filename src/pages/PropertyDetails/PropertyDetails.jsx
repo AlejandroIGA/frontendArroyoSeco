@@ -171,14 +171,34 @@ const PropertyDetails = () => {
                                             pagination={true}
                                             loop={true}
                                             autoplay={{ delay: 3000 }}
+                                            style={{ 
+                                                width: '100%',
+                                                height: '500px',
+                                                borderRadius: '8px',
+                                                overflow: 'hidden',
+                                                backgroundColor: '#000'
+                                            }}
                                         >
                                             {property.imagen.map((imageUrl, index) => (
                                                 <SwiperSlide key={index}>
-                                                    <div className="main-image-container">
+                                                    <div style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        backgroundColor: '#000'
+                                                    }}>
                                                         <IonImg
                                                             src={imageUrl}
                                                             alt={`${property.name} - Imagen ${index + 1}`}
-                                                            className="main-property-image"
+                                                            style={{
+                                                                maxWidth: '100%',
+                                                                maxHeight: '100%',
+                                                                width: 'auto',
+                                                                height: 'auto',
+                                                                objectFit: 'contain'
+                                                            }}
                                                         />
                                                     </div>
                                                 </SwiperSlide>
