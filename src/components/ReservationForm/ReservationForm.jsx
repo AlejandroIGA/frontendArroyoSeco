@@ -66,15 +66,30 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
     numberOfNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
   const totalPrice = (pricePerNight * numberOfNights).toFixed(2);
+
   const handleBookingSubmit = async () => {
     setIsLoading(true);
     setError(null);
+    
+    const response = await bookingService.getMyBookings();
+    const myBookings = response.data;
+    const hasPendingBooking = myBookings.some(booking =>
+        booking.propertyId === propertyId && booking.status === "Pendiente"
+      );
+
+      if (hasPendingBooking) {
+        setError("Ya tiene una reserva pendiente para esta propiedad.");
+        setIsLoading(false);
+        return;
+      }
+
     const bookingData = {
       propertyId: propertyId,
       startDate: bookingDetails.startDate,
       endDate: bookingDetails.endDate,
       status: "Pendiente"
     };
+
     try {
       if (!sessionStorage.getItem("token")) {
         setError("Debe iniciar sesión")
