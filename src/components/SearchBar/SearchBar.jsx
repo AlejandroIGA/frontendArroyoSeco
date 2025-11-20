@@ -18,7 +18,7 @@ const validatePrice = (e, callback) => {
     value = value.replace(/[^0-9.]/g, "");
     let num = parseFloat(value);
     if (!num || num < 1) num = "";
-    if (num > 999) num = 999;
+    if (num > 100000) num = 100000;
     if (value.includes(".")) {
         value = value.replace(/(\.\d{2})\d+/, "$1");
         num = value;

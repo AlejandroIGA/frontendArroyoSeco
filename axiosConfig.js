@@ -20,6 +20,7 @@ apiClient.interceptors.request.use(
             '/user/reset',
             '/user/verify-code',
             '/user/reset-password',
+            '/properties/search'
         ];
         
         // Verificar si la URL actual es un endpoint público
