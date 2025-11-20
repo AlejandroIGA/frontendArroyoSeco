@@ -8,7 +8,6 @@ const validateGuests = (e, callback) => {
     value = value.replace(/[^0-9]/g, "");
     let num = parseInt(value);
     if (!num || num < 1) num = "";
-    if (num > 20) num = 20;
     e.target.value = num;
     callback(e);
 };
@@ -64,7 +63,6 @@ const SearchBar = ({
                         value={searchCriteria.price}
                         onIonInput={(e) => validatePrice(e, handleInputChange)}
                         min="1.00"
-                        max="999.00"
                         step="0.01"
                         onKeyDown={(e) => {
                             if (["-", "+", "e", "E"].includes(e.key)) {
