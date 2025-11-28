@@ -58,22 +58,69 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
     if (field === 'startDate') setShowStartDateModal(false);
     if (field === 'endDate') setShowEndDateModal(false);
   };
+
   const start = new Date(bookingDetails.startDate);
   const end = new Date(bookingDetails.endDate);
-  let numberOfNights = 1; // Mínimo 1 noche
+  let numberOfNights = 1;
   if (end > start) {
     const diffTime = Math.abs(end - start);
     numberOfNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
   const totalPrice = (pricePerNight * numberOfNights).toFixed(2);
 
+  // Función para verificar disponibilidad de fechas
+  const checkDateAvailability = async (startDate, endDate) => {
+    try {
+      const userStartDate = new Date(startDate + 'T00:00:00');
+      const userEndDate = new Date(endDate + 'T00:00:00');
+
+      // Obtener todas las reservas de esta propiedad
+      const allBookingsResponse = await bookingService.searchBookings({});
+      const allBookings = allBookingsResponse.data;
+
+      // Filtrar reservas de esta propiedad específica
+      const propertyBookings = allBookings.filter(
+        booking => booking.propertyId === propertyId
+      );
+
+      // Verificar si hay conflictos con las fechas seleccionadas
+      const conflictingBookings = propertyBookings.filter(booking => {
+        // Solo considerar reservas aceptadas o pendientes
+        if (booking.status !== 'Aceptada' && booking.status !== 'Pendiente') {
+          return false;
+        }
+
+        const bookingStartDate = new Date(booking.startDate);
+        const bookingEndDate = new Date(booking.endDate);
+
+        // Verificar si hay solapamiento de fechas
+        const isOverlap = (bookingStartDate <= userEndDate) && (bookingEndDate >= userStartDate);
+        return isOverlap;
+      });
+
+      return conflictingBookings.length === 0; // true si está disponible, false si hay conflictos
+    } catch (err) {
+      console.error("Error al verificar disponibilidad:", err);
+      return false;
+    }
+  };
+
   const handleBookingSubmit = async () => {
     setIsLoading(true);
     setError(null);
-    
-    const response = await bookingService.getMyBookings();
-    const myBookings = response.data;
-    const hasPendingBooking = myBookings.some(booking =>
+
+    try {
+      // Verificar que el usuario esté autenticado
+      if (!sessionStorage.getItem("token")) {
+        setError("Debe iniciar sesión");
+        setIsLoading(false);
+        return;
+      }
+
+      // Verificar si el usuario ya tiene una reserva pendiente para esta propiedad
+      const response = await bookingService.getMyBookings();
+      const myBookings = response.data;
+      const hasPendingBooking = myBookings.some(booking =>
         booking.propertyId === propertyId && booking.status === "Pendiente"
       );
 
@@ -83,18 +130,26 @@ const ReservationForm = ({ propertyId, pricePerNight }) => {
         return;
       }
 
-    const bookingData = {
-      propertyId: propertyId,
-      startDate: bookingDetails.startDate,
-      endDate: bookingDetails.endDate,
-      status: "Pendiente"
-    };
+      // Verificar disponibilidad de fechas
+      const isAvailable = await checkDateAvailability(
+        bookingDetails.startDate,
+        bookingDetails.endDate
+      );
 
-    try {
-      if (!sessionStorage.getItem("token")) {
-        setError("Debe iniciar sesión")
+      if (!isAvailable) {
+        setError("Las fechas seleccionadas no están disponibles. Por favor, seleccione otras fechas.");
+        setIsLoading(false);
         return;
       }
+
+      // Si todo está bien, crear la reserva
+      const bookingData = {
+        propertyId: propertyId,
+        startDate: bookingDetails.startDate,
+        endDate: bookingDetails.endDate,
+        status: "Pendiente"
+      };
+
       await bookingService.registerBooking(bookingData);
       setToastMessage("¡Reserva solicitada con éxito! Recibirás una confirmación.");
       setTimeout(() => {
