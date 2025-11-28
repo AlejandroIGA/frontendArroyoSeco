@@ -106,7 +106,8 @@ const ResetPassword = () => {
                 handleResetProcess(); // Llama a la función para limpiar y navegar
             }
         } catch (error) {
-            const errorMsg = error?.response?.data?.message || error?.message || 'Ocurrió un error';
+            console.log(error);
+            const errorMsg = error?.response?.data?.mensaje || error?.message || 'Ocurrió un error';
             presentToast({ message: errorMsg, duration: 3000, color: 'danger' });
         } finally {
             setLoading(false);
@@ -118,7 +119,7 @@ const ResetPassword = () => {
             setCurrentStep(currentStep - 1);
             setErrors({ email: '', code: '', newPassword: '', confirmPassword: '' });
         } else {
-            history.push('/login');
+            //history.push('/login');
         }
     };
 

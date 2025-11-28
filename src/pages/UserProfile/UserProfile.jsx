@@ -162,9 +162,9 @@ const UserProfile = () => {
                                     <IonButton onClick={handleUpdateProfile} className="ion-margin-top">
                                         Guardar Cambios
                                     </IonButton>
-                                    <IonButton fill="outline" routerLink="/reset-password" className="ion-margin-top ion-margin-start">
+                                    {/*<IonButton fill="outline" routerLink="/reset-password" className="ion-margin-top ion-margin-start">
                                         Cambiar Contraseña
-                                    </IonButton>
+                                    </IonButton>*/}
                                     <IonButton fill="outline" routerLink="/DeleteMyInfo" className="ion-margin-top ion-margin-start">
                                         Eliminar Cuenta
                                     </IonButton>

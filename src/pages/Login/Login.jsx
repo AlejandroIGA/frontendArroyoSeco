@@ -191,7 +191,7 @@ const Login = () => {
                                         Regístrate aquí
                                     </IonRouterLink>
                                 </div>
-                                <div className="ion-text-center ion-margin-top register-link-container">
+                                <div className="ion-text-center ion-margin-top register-link-container" hidden={true}>
                                     <span>¿Olvidaste tu contraseña? </span>
                                     <IonRouterLink routerLink="/reset-password" className="register-link">
                                         Crea una nueva aquí
