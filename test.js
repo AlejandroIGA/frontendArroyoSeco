@@ -6,9 +6,9 @@ import execution from "k6/execution";
 
 export const options = {
   stages: [
-    { target: 20, duration: "1m" },
-    { target: 20, duration: "1m30s" },
-    { target: 0, duration: "1m" },
+    { target: 20, duration: "30s" },
+    { target: 20, duration: "30s" },
+    { target: 0, duration: "30s" },
   ],
 };
 
