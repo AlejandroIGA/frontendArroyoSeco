@@ -15,7 +15,7 @@ const PrivacyPoliciy = () => {
             </IonHeader>
             <IonContent className="ion-padding">
                 
-                <h2>1. Introducción</h2>
+                <h2>1. Introducción 12121</h2>
                 <p>El Sistema de Reserva de Alojamientos Turísticos de Arroyo Seco (en adelante, " la Aplicación ", " nosotros ", " nuestro " o " nuestros ") proporciona a sus clientes y usuarios (" Usuario(s) " o " usted ") una plataforma digital que conecta directamente a anfitriones (propietarios de alojamientos) con visitantes (turistas) en la región de Arroyo Seco, Querétaro, facilitando la búsqueda, reservación y gestión de hospedajes (el "Servicio").</p>
                 <p>La Aplicación está comprometida con su privacidad. Esta Política de Privacidad tiene como objetivo informarle sobre nuestra recopilación, uso, divulgación, retención y protección de su información personal al utilizar nuestro Servicio.</p>
                 <p>Por favor, lea cuidadosamente este Aviso de Privacidad antes de acceder o utilizar nuestros servicios.</p>
