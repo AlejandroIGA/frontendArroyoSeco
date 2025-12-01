@@ -13,6 +13,8 @@ Para ejecutar este proyecto localmente, necesitas tener instalado:
 3.  **Git**: Para clonar el repositorio.
 4.  **Backend en ejecución**: Necesitas tener el servidor backend de la API corriendo para que la aplicación funcione correctamente.
 
+Test
+
 ```bash
 git clone <URL_DEL_REPOSITORIO>
 cd frontendarroyoseco
